@@ -1514,3 +1514,18 @@ table.table-inbox tbody tr.checked {background-color: #ffffcc;}
 	.chat-menu.navbar-nav > li > a {margin-left: 10px;}
 	.contact-alphapets {top:113px;}
 }
+
+.error-ems {
+    background: #fc5858;
+    text-align: center;
+    color: #fff;
+    margin-bottom: 5px;
+    margin-top: -20px;
+}
+label.error{
+  color:red;
+}
+
+.form-group {
+    height: 80px;
+}

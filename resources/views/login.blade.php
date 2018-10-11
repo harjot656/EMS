@@ -26,19 +26,28 @@
 							<div class="account-logo">
 								<a href="index.php"><img src="{{asset('img/logo2.png')}}" alt="Focus Technologies"></a>
 							</div>
-							<form name="login" method="POST" action="{{route('login')}}">
+							<form name="login" method="POST" action="{{route('performLogin')}}">
 								@csrf
 								<div class="form-group form-focus">
 									<label class="control-label">Username or Email</label>
-									<input class="form-control floating" type="text">
+									<input class="form-control floating" type="text" name="username">
 								</div>
+								@if ($errors->has('username'))
+									    <div class="error-ems">{{ $errors->first('username') }}</div>
+									@endif
 								<div class="form-group form-focus">
 									<label class="control-label">Password</label>
-									<input class="form-control floating" type="password">
+									<input class="form-control floating" type="password" name="password">	
 								</div>
+								@if ($errors->has('password'))
+									    <div class="error-ems">{{ $errors->first('password') }}</div>
+									@endif
 								<div class="form-group text-center">
 									<button class="btn btn-primary btn-block account-btn" type="submit">Login</button>
 								</div>
+								@if ($errors->has('errors'))
+									    <div class="error-ems">{{ $errors->first('errors') }}</div>
+									@endif
 								<div class="text-center">
 									<a href="forgot-password.php">Forgot your password?</a>
 								</div>

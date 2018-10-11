@@ -27,3 +27,7 @@ Route::get('departments','HomeController@showDepartment')->name('departments');
 Route::get('designations','HomeController@showDesignation')->name('designations');
 Route::get('profile','HomeController@getProfile')->name('profile');
 Route::get('edit-profile','HomeController@editProfile')->name('edit-profile');
+// Route::get('add-employee','HomeController@addEmployee')->name('add-employee');
+
+Route::post('saveEmployee','HomeController@saveEmployee')->name('saveEmployee');
+Route::post('performLogin','HomeController@performLogin')->name('performLogin');

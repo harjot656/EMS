@@ -60,9 +60,12 @@
 							<li><a class="active" href="{{route('index')}}">All Employees</a></li>
 							<!-- <li><a href="">Holidays</a></li> -->
 							<!-- <li><a href=""><span>Leave Requests</span> <span class="badge bg-primary pull-right">1</span></a></li> -->
-							<li><a href="{{route('attendance')}}">Attendance</a></li>
+							<!-- <li><a href="{{route('attendance')}}">Attendance</a></li>
 							<li><a href="{{route('departments')}}">Departments</a></li>
-							<li><a href="{{route('designations')}}">Designations</a></li>
+							<li><a href="{{route('designations')}}">Designations</a></li> -->
+							<li><a href="javascript:void(0);">Attendance</a></li>
+							<li><a href="javascript:void(0);">Departments</a></li>
+							<li><a href="javascript:void(0);">Designations</a></li>
 							
 						</ul>
 						
