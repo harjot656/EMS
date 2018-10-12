@@ -31,3 +31,5 @@ Route::get('edit-profile','HomeController@editProfile')->name('edit-profile');
 
 Route::post('saveEmployee','HomeController@saveEmployee')->name('saveEmployee');
 Route::post('performLogin','HomeController@performLogin')->name('performLogin');
+Route::get('add-attendance','HomeController@addAttendance')->name('add-attendance');
+Route::post('saveAttendance','HomeController@saveAttendance')->name('saveAttendance');

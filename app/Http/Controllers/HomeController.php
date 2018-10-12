@@ -13,6 +13,8 @@ use Kreait\Firebase\ServiceAccount;
 use Kreait\Firebase\Database;
 use Illuminate\Http\Request;
 use App\FirebaseDb; 
+use Validator;
+use Response;
 
 class HomeController extends Controller
 {
@@ -123,5 +125,50 @@ class HomeController extends Controller
                return redirect()->back()->withErrors(['errors'=>'Username does not exist.']);
         }
         
+    }
+
+    public function addAttendance(Request $request){
+        
+        $database  = new FirebaseDb;
+        
+        $reference = $database->get_database()->getReference('users');
+        
+        $snapshot = $reference->getSnapshot();
+        $value = $snapshot->getValue();
+        $value = $reference->getValue();
+        $data['number_days'] = date('t');
+        $data['value'] = $value;
+        // echo "<pre>";print_r($data['value']);
+        // die;
+        return view('add_attendance')->with('data',$data);
+    }
+
+    public function saveAttendance(Request $request){
+    	    $data = $request->all();        
+		    $myValue=  array();
+		    parse_str($data['param1'], $myValue);
+
+		    $validator = Validator::make($myValue, [
+	            'attendance_date' => 'required',
+	            'in_time' => 'required',
+	            'out_time' => 'required',
+	            'comments' =>'required'
+        	]);
+        	if ($validator->fails())
+	        {
+	        	return Response::json(array(
+			        'success' => false,
+			        'errors' => $validator->getMessageBag()->toArray()
+
+			    ), 400);
+	            //return response()->json(['errors'=>$validator->errors()->all()]);
+	        }
+		    echo "<pre>";
+		    print_r($myValue);
+		    die;
+    	echo $request->employee_id;
+    	die;
+    	print_r($request->all());
+    	die;
     }
 }

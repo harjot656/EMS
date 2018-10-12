@@ -63,7 +63,7 @@
 							<!-- <li><a href="{{route('attendance')}}">Attendance</a></li>
 							<li><a href="{{route('departments')}}">Departments</a></li>
 							<li><a href="{{route('designations')}}">Designations</a></li> -->
-							<li><a href="javascript:void(0);">Attendance</a></li>
+							<li><a href="{{route('add-attendance')}}">Attendance</a></li>
 							<li><a href="javascript:void(0);">Departments</a></li>
 							<li><a href="javascript:void(0);">Designations</a></li>
 							
