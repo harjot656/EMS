@@ -32,4 +32,9 @@ Route::get('edit-profile','HomeController@editProfile')->name('edit-profile');
 Route::post('saveEmployee','HomeController@saveEmployee')->name('saveEmployee');
 Route::post('performLogin','HomeController@performLogin')->name('performLogin');
 Route::get('add-attendance','HomeController@addAttendance')->name('add-attendance');
+
+Route::get('add-attendance2','HomeController@addAttendance2')->name('add-attendance2');
+
+Route::post('getTime','HomeController@getTime')->name('getTime');
 Route::post('saveAttendance','HomeController@saveAttendance')->name('saveAttendance');
+Route::post('prevNextWeek','HomeController@prevNextWeek');
