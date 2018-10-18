@@ -31,7 +31,7 @@ $.ajax({
 	                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
 	             },
 	            async: false,
-    			url: 'prevNextWeek',
+    			url: 'prevNextWeek2',
     			type: 'POST',
     			dataType:'html',
     			data: {week:week,employee_id:employee_id,employee_name:employee_name,last_date:last_date,prev_week_sunday:prev_week_sunday,prev_week_monday:prev_week_monday},

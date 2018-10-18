@@ -160,7 +160,7 @@ border-radius: 0;
 	
 	<div class="modal-dialog">
 		
-		<button type="button" class="close m-b-20" data-dismiss="modal">&times;</button>
+		<button type="button" id="myModal" class="close m-b-20" data-dismiss="modal">&times;</button>
 			<div class="modal-content modal-md mod">
 				<div class="modal-header">
 					<h4 class="modal-title">Add Attendance</h4>
@@ -310,23 +310,26 @@ border-radius: 0;
 @endsection
 @section('local_script')
 <script src="{{asset('js/timedropper.js')}}"></script>
-<script type="text/javascript" src="{{asset('js/add_attendance.js')}}"></script>
+<script type="text/javascript" src="{{asset('js/add_attendance2.js')}}"></script>
 <!-- <script src="{{asset('js/jquery.datetimepicker.full.min.js')}}"></script> -->
 		
 		<script type="text/javascript">
+			$('#myModal').on('click', function () {
+				 location.reload();
+				})
 			$(function(){
 			$(".loader").hide();
 				$(document).on("focus", "input.in_time" , function() {
 					$(this).datetimepicker({
 						format: 'LT',
-						maxDate: moment()
+						// maxDate: moment()
 					});
 					
 				});
 				$(document).on("focus", "input.out_time" , function() {
 					$(this).datetimepicker({
 						format: 'LT',
-						maxDate: moment()
+						// maxDate: moment()
 					});
 					
 				});
@@ -336,11 +339,11 @@ border-radius: 0;
 				});
 				$(".in_time").datetimepicker({
 					format: 'LT',
-					maxDate: moment()
+					// maxDate: moment()
 				});
 				$(".out_time").datetimepicker({
 					format: 'LT',
-					maxDate: moment()
+					// maxDate: moment()
 				});
 			});
 			

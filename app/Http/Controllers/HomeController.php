@@ -31,7 +31,7 @@ class HomeController extends Controller
 
         $database  = new FirebaseDb;
         
-        $reference = $database->get_database()->getReference('users');
+        $reference = $database->get_database()->getReference('employee');
         
         $snapshot = $reference->getSnapshot();
         $value = $snapshot->getValue();
@@ -90,6 +90,36 @@ class HomeController extends Controller
         $reference->push($postData);
         
                  return redirect('index');
+    }
+
+    public function editEmployee(Request $request){
+        $database  = new FirebaseDb;
+        // echo "<pre>";print_r($request->all());
+        // die;
+        $reference = $database->get_database()->getReference('employee/'.$request->node.'')->set([
+                       'first_name' => $request->first_name,
+                       'last_name'=>$request->last_name,
+                       'email'=>$request->email,
+                       'employee_id'=>$request->employee_id,
+                       'joining_date'=>$request->joining_date,
+                       'designation'=>$request->designation,
+                       'phone'=>$request->phone
+                      ]);
+        if($reference){
+            return redirect()->back()->with('success','Employee edited successfully');
+        }else{
+            return redirect()->back()->with('error','Error while editing');
+        }
+        // $reference = $database->get_database()->getReference('employee/'.$request->node.'');
+
+    }
+
+    public function removeEmployee(Request $request){
+        $database  = new FirebaseDb;
+        $reference = $database->get_database()->getReference('employee/'.$request->param1.'')->remove();
+        if($reference){
+            return "1";
+        }
     }
     public function performLogin(Request $request){
         
@@ -417,6 +447,7 @@ class HomeController extends Controller
        foreach($data['date'] as $key=>$value){
                 $dynamic_atten = $this->getDynamicAttendance($data,$value['date']);
                 if(!empty($dynamic_atten)){
+
                             $html .="<td><div class='form-focus select-focus'><label class='control-label'></label><select class='select'  name=status_presence#".$value['date']."><option value=''>--Select--</option>";
                             for($i=0;$i<5;$i++){
                                 if(trim(strtolower($dynamic_atten['status'])) == $list_arr[$i]){
@@ -500,6 +531,7 @@ class HomeController extends Controller
                 $returndata['shift_hours'] = !isset($employee_attendance['shift_hours'])?'0 hours':$employee_attendance['shift_hours'];
 
             return $returndata;
+
            // echo "<pre>"; print_r($returndata);die;
         }else{
             return array();

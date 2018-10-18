@@ -12,7 +12,18 @@
 							
 						</div>
 					</div>
-					
+					@if(Session::has('success'))
+					<div class="alert alert-success alert-dismissible">
+						<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+						<strong>Success!</strong> {{Session::get('success') }}
+					</div>
+					@endif
+					@if(Session::has('error'))
+					<div class="alert alert-danger alert-dismissible">
+						<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+						<strong>Success!</strong> {{Session::get('error') }}
+					</div>
+					@endif
 					<div class="row">
 						<div class="col-md-12">
 							<div class="table-responsive">
@@ -31,6 +42,7 @@
 									<tbody>
 										@if(!empty($data))
 										@foreach($data as $key=>$value)
+
 										<tr>
 											<td>
 												<a href="profile.php" class="avatar">J</a>
@@ -44,8 +56,8 @@
 												<div class="dropdown">
 													<a href="#" class="action-icon dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-ellipsis-v"></i></a>
 													<ul class="dropdown-menu pull-right">
-														<li><a href="#" data-toggle="modal" ><i class="fa fa-pencil m-r-5"></i> Edit</a></li>
-														<li><a href="#" data-toggle="modal" ><i class="fa fa-trash-o m-r-5"></i> Delete</a></li>
+														<li><a href="#" data-toggle="modal" data-target="#edit_employee" onclick="edit_employeee({{$value['employee_id']}},'{{$value['designation']}}','{{$value['first_name']}}','{{$value['last_name']}}','{{$value['email']}}',{{$value['phone']}},'{{$value['joining_date']}}','{{$key}}');"><i class="fa fa-pencil m-r-5"></i> Edit</a></li>
+														<li><a href="Javascript:void(0);" data-toggle="modal"  onclick="if(confirm('Are you sure you want to remove this user?')){event.stopPropagation(); event.preventDefault(); remove_user('{{$key}}');}else{event.stopPropagation(); event.preventDefault();}"><i class="fa fa-trash-o m-r-5"></i> Delete</a></li>
 													</ul>
 												</div>
 											</td>
@@ -372,33 +384,34 @@
 							<h4 class="modal-title">Edit Employee</h4>
 						</div>
 						<div class="modal-body">
-							<form class="m-b-30">
+							<form class="m-b-30" id="edit_employeee" method="POST" action="{{route('editEmployee')}}" >
+								@csrf
 								<div class="row">
 									<div class="col-sm-6">
 										<div class="form-group">
 											<label class="control-label">First Name <span class="text-danger">*</span></label>
-											<input class="form-control" value="John" type="text">
+											<input class="form-control" type="text" id="first_name" name="first_name">
 										</div>
 									</div>
 									<div class="col-sm-6">
 										<div class="form-group">
 											<label class="control-label">Last Name</label>
-											<input class="form-control" value="Doe" type="text">
+											<input class="form-control" type="text" id="last_name" name="last_name">
 										</div>
 									</div>
-									<div class="col-sm-6">
+									<!-- <div class="col-sm-6">
 										<div class="form-group">
 											<label class="control-label">Username <span class="text-danger">*</span></label>
 											<input class="form-control" value="johndoe" type="text">
 										</div>
-									</div>
+									</div> -->
 									<div class="col-sm-6">
 										<div class="form-group">
 											<label class="control-label">Email <span class="text-danger">*</span></label>
-											<input class="form-control" value="johndoe@example.com" type="email">
+											<input class="form-control" type="email" id="email" name="email">
 										</div>
 									</div>
-									<div class="col-sm-6">
+									<!-- <div class="col-sm-6">
 										<div class="form-group">
 											<label class="control-label">Password</label>
 											<input class="form-control" value="johndoe" type="password">
@@ -409,26 +422,26 @@
 											<label class="control-label">Confirm Password</label>
 											<input class="form-control" value="johndoe" type="password">
 										</div>
-									</div>
+									</div> -->
 									<div class="col-sm-6">  
 										<div class="form-group">
 											<label class="control-label">Employee ID <span class="text-danger">*</span></label>
-											<input type="text" value="FT-0001" readonly="" class="form-control floating">
+											<input type="text" class="form-control" id="employee_id" name="employee_id">
 										</div>
 									</div>
 									<div class="col-sm-6">  
 										<div class="form-group">
 											<label class="control-label">Joining Date <span class="text-danger">*</span></label>
-											<div class="cal-icon"><input class="form-control datetimepicker" type="text"></div>
+											<div class="cal-icon"><input class="form-control datetimepicker" id="joining_date" type="text" name="joining_date"></div>
 										</div>
 									</div>
 									<div class="col-sm-6">
 										<div class="form-group">
 											<label class="control-label">Phone </label>
-											<input class="form-control" value="9843014641" type="text">
+											<input class="form-control" type="text" id="phone" name="phone">
 										</div>
 									</div>
-									<div class="col-sm-6">
+									<!-- <div class="col-sm-6">
 										<div class="form-group">
 											<label class="control-label">Company</label>
 											<select class="select">
@@ -436,142 +449,21 @@
 												<option value="1">Delta Infotech</option>
 											</select>
 										</div>
-									</div>
+									</div> -->
 									<div class="col-sm-6">
 										<div class="form-group">
 											<label class="control-label">Designation</label>
-											<select class="select">
-												<option>Web Developer</option>
-												<option>Web Designer</option>
-												<option>SEO Analyst</option>
+											<select class="select" name="designation" id="designation">
+												<option value="Web Developer">Web Developer</option>
+												<option value="Web Designer">Web Designer</option>
+												<option value ="SEO Analyst">SEO Analyst</option>
 											</select>
 										</div>
 									</div>
 								</div>
-								<div class="table-responsive m-t-15">
-									<table class="table table-striped custom-table">
-										<thead>
-											<tr>
-												<th>Module Permission</th>
-												<th class="text-center">Read</th>
-												<th class="text-center">Write</th>
-												<th class="text-center">Create</th>
-												<th class="text-center">Delete</th>
-												<th class="text-center">Import</th>
-												<th class="text-center">Export</th>
-											</tr>
-										</thead>
-										<tbody>
-											<tr>
-												<td>Holidays</td>
-												<td class="text-center">
-													<input checked="" type="checkbox">
-												</td>
-												<td class="text-center">
-													<input type="checkbox">
-												</td>
-												<td class="text-center">
-													<input type="checkbox">
-												</td>
-												<td class="text-center">
-													<input type="checkbox">
-												</td>
-												<td class="text-center">
-													<input type="checkbox">
-												</td>
-												<td class="text-center">
-													<input type="checkbox">
-												</td>
-											</tr>
-											<tr>
-												<td>Leave Request</td>
-												<td class="text-center">
-													<input checked="" type="checkbox">
-												</td>
-												<td class="text-center">
-													<input checked="" type="checkbox">
-												</td>
-												<td class="text-center">
-													<input checked="" type="checkbox">
-												</td>
-												<td class="text-center">
-													<input type="checkbox">
-												</td>
-												<td class="text-center">
-													<input type="checkbox">
-												</td>
-												<td class="text-center">
-													<input type="checkbox">
-												</td>
-											</tr>
-											<tr>
-												<td>Projects</td>
-												<td class="text-center">
-													<input checked="" type="checkbox">
-												</td>
-												<td class="text-center">
-													<input type="checkbox">
-												</td>
-												<td class="text-center">
-													<input type="checkbox">
-												</td>
-												<td class="text-center">
-													<input type="checkbox">
-												</td>
-												<td class="text-center">
-													<input type="checkbox">
-												</td>
-												<td class="text-center">
-													<input type="checkbox">
-												</td>
-											</tr>
-											<tr>
-												<td>Tasks</td>
-												<td class="text-center">
-													<input checked="" type="checkbox">
-												</td>
-												<td class="text-center">
-													<input checked="" type="checkbox">
-												</td>
-												<td class="text-center">
-													<input checked="" type="checkbox">
-												</td>
-												<td class="text-center">
-													<input checked="" type="checkbox">
-												</td>
-												<td class="text-center">
-													<input type="checkbox">
-												</td>
-												<td class="text-center">
-													<input type="checkbox">
-												</td>
-											</tr>
-											<tr>
-												<td>Chats</td>
-												<td class="text-center">
-													<input checked="" type="checkbox">
-												</td>
-												<td class="text-center">
-													<input checked="" type="checkbox">
-												</td>
-												<td class="text-center">
-													<input checked="" type="checkbox">
-												</td>
-												<td class="text-center">
-													<input checked="" type="checkbox">
-												</td>
-												<td class="text-center">
-													<input type="checkbox">
-												</td>
-												<td class="text-center">
-													<input type="checkbox">
-												</td>
-											</tr>
-										</tbody>
-									</table>
-								</div>
+								<input type="hidden" name="node" id="node_val">
 								<div class="m-t-20 text-center">
-									<button class="btn btn-primary">Save Changes</button>
+									<button class="btn btn-primary" id="editt_employee">Save Changes</button>
 								</div>
 							</form>
 						</div>
@@ -599,4 +491,37 @@
 		<div class="sidebar-overlay" data-reff="#sidebar"></div>
 
 		@endsection
-		
+@section('local_script')
+	<script type="text/javascript">
+		function edit_employeee(employee_id,desig,f_name,l_name,email,phone,joining_date,node){
+			$("#first_name").val(f_name);
+			$("#last_name").val(l_name);
+			$("#email").val(email);
+			$("#phone").val(phone);
+			$("#employee_id").val(employee_id);
+			$("#designation").val(desig);
+			$("#joining_date").val(joining_date);
+			$("#node_val").val(node);
+		}
+		function remove_user(node){
+			$.ajax({
+				 headers: {
+			        'X-CSRF-TOKEN': $('input[name="_token"]').val()
+			    },
+				url: '{{route("removeEmployee")}}',
+				type: 'POST',
+				data: {param1: node},
+			})
+			.done(function(data) {
+				if(data =='1'){
+					alert("Employee removed successfully");
+					location.reload();
+				}
+				// console.log("success");
+			});
+			
+			// console.log(node);
+		}
+		</script>
+		<!-- <script type="text/javascript" src="{{asset('js/index.js')}}"></script> -->
+@endsection

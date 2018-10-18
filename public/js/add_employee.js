@@ -49,3 +49,39 @@ $("#create_employee").on('click',function(e){
 jQuery.validator.addMethod("lettersonly", function(value, element) {
   return this.optional(element) || /^[a-z]+$/i.test(value);
 }, "Letters only please"); 
+
+
+$("#edit_employeee").validate({
+	rules:{
+		first_name:{
+			required:true,
+			lettersonly:true
+		},
+		last_name:{
+			required:true,
+			lettersonly:true	
+		},
+		email:{
+			required:true,
+			email:true
+		},
+		employee_id:{
+    	required:true
+    	},
+    	joining_date:{
+	    	required:true,
+	    	date:true
+    	},
+    	phone:{
+	    	required:true,
+	    	maxlength:10,
+	    	minlength:10,
+	    	digits:true
+    	}
+	}
+});
+
+$("#editt_employee").on('click',function(event) {
+	var valid = $("#edit_employeee").valid();
+	if(!valid)event.preventDefault();
+});

@@ -38,3 +38,9 @@ Route::get('add-attendance2','HomeController@addAttendance2')->name('add-attenda
 Route::post('getTime','HomeController@getTime')->name('getTime');
 Route::post('saveAttendance','HomeController@saveAttendance')->name('saveAttendance');
 Route::post('prevNextWeek','HomeController@prevNextWeek');
+
+Route::get('add-attendance3','HomeController2@addAttendance3')->name('add-attendance3');
+Route::post('saveAttendance2','HomeController2@saveAttendance2')->name('saveAttendance2');
+Route::post('prevNextWeek2','HomeController2@prevNextWeek2');
+Route::post('editEmployee','HomeController@editEmployee')->name('editEmployee');
+Route::post('removeEmployee','HomeController@removeEmployee')->name('removeEmployee');
