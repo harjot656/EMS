@@ -56,12 +56,12 @@ border-radius: 0;
 						</div>
 					</div>
 					<div class="row filter-row">
-						<div class="col-sm-3 col-xs-6">  
+						<!-- <div class="col-sm-3 col-xs-6">  
 							<div class="form-group form-focus">
 								<label class="control-label">Employee ID</label>
 								<input type="text" class="form-control floating" />
 							</div>
-						</div>
+						</div> -->
 						<div class="col-sm-3 col-xs-6"> 
 							<div class="form-group form-focus select-focus">
 								<label class="control-label" name="month">Select Month</label>
@@ -108,39 +108,40 @@ border-radius: 0;
 										<?php $arr= array(); ?>
 										@foreach($data['value'] as $key=>$value)
 										<tr>	
-											<td><a href="#" onclick="open_attendance_modal(this.text,<?php echo $value['employee_id'];?>,<?php echo "'$key'"; ?>) "data-toggle="modal" data-target="#add_attendence">{{$value['first_name']}} {{''}} {{$value['last_name']}}</a></td>
-											@if(isset($value['attendance']))
-												
-
-
+											<!-- <input type="hidden" name="last_date" id="last_date" value="{{@$data['last_date']}}">
+											<input type="hidden" name="prev_week_sunday" id="prev_week_sunday" value="{{@$data['prev_week_sunday']}}">
+											<input type="hidden" name="prev_week_monday" id="prev_week_monday" value="{{@$data['prev_week_monday']}}"> -->
+											<td><a href="#" onclick="open_attendance_modal(this.text,'{{$value['employee_id']}}',<?php echo "'$key'"; ?>,'{{@$data['last_date']}}','{{@$data['prev_week_sunday']}}','{{@$data['prev_week_monday']}}') "data-toggle="modal" data-target="#add_attendence">{{$value['first_name']}} {{''}} {{$value['last_name']}}</a></td>
+											@if(isset($value['attendance']))								
 												@foreach($value['attendance'] as $keyy=>$valuee)
 													<?php 
-														
+													
 														$a = (int)date('d',strtotime($keyy)) - 1;
 														$data['attendance'][$a]	= 1;
-
+														$data['attendance_employee'][$a] = $valuee;
 													 ?>
-
+													 
 												@endforeach
-
-
 												@for($j=0;$j<=(count($data['list_date']));$j++)
-												
-												 
+												<?php //echo "<pre>";print_r($data['attendance_employee']);die; ?>
+
 													@if($data['attendance'][$j] == 1)	
-
-														<td title="In Time: 09:20 AM -- Out Time: 05:30 PM" ><i class="fa fa-check text-success"></i> </td>
-														<?php $data['attendance'][$j] = 0; ?>
-
+													<?php $status = ucwords($data['attendance_employee'][$j]['status']);
+														if($status =='Present'){
+														$sign = "<i class='fa fa-check text-success'></i>";	
+														}else{
+															$sign = "<i class='fa fa-close text-danger'></i>";
+														}
+													?>
+														<td title="{{$status}}{{$data['attendance_employee'][$j]['in-time']}}" ><?= $sign ?></td>
+														<?php $data['attendance'][$j] = 0; $data['attendance_employee'][$j] = array();?>
 												 	@else
-												 
-													<td title="Absent"><i class="fa fa-close text-danger"></i> </td> 
+													<td title="#"><i class='fa fa-close text-danger'></i></td> 
 													@endif
-
 												@endfor
 											@else
-												@for($j=0;$j<(count($data['list_date']));$j++)
-													<td title="NA">N/A </td>	 
+												@for($j=0;$j<=(count($data['list_date']));$j++)
+													<td title="#"><i class='fa fa-close text-danger'></i></td>	 
 												@endfor
 											@endif 
 										</tr>
@@ -205,7 +206,7 @@ border-radius: 0;
 											<td>
 												<div class=" form-focus select-focus">
 													<label class="control-label"></label>
-													<select class="select"  name="status_presence#{{$value['date']}}">
+													<select class="select status_presence"  name="status_presence#{{$value['date']}}">
 														<option  value="">--Select--</option>	
 														<option value="present">Present</option>
 														<option value="absent">Absent</option>
@@ -224,7 +225,8 @@ border-radius: 0;
 											<td>
 												<div class=" form-focus select-focus">
 													<label class="control-label"></label>
-													<input class="time_select in_time" id="in_time#{{$value['date']}}" name="in_time#{{$value['date']}}"   type="text" placeholder=""/>
+													
+													<input class="time_select in_time" disabled id="in_time#{{$value['date']}}" name="in_time#{{$value['date']}}"   type="text" placeholder=""/>
 													
 												</div>
 											</td>
@@ -237,7 +239,7 @@ border-radius: 0;
 													<td>
 														<div class="form-focus select-focus">
 															<label class="control-label"></label>
-															<input class="time_select out_time" id="out_time#{{$value['date']}}" name="out_time#{{$value['date']}}"   type="text" placeholder=""/>
+															<input class="time_select out_time" disabled id="out_time#{{$value['date']}}" name="out_time#{{$value['date']}}"   type="text" placeholder=""/>
 															
 														</div>
 													</td>
@@ -250,7 +252,7 @@ border-radius: 0;
 													<td>
 														<div class="form-focus select-focus">
 															<label class="control-label"></label>
-															<input class="time_select" id="total_time#{{$value['date']}}" name="total_time#{{$value['date']}}" readonly  type="text" placeholder=""/>
+															<input class="time_select" disabled id="total_time#{{$value['date']}}" name="total_time#{{$value['date']}}" readonly  type="text" placeholder=""/>
 															
 														</div>
 													</td>
@@ -263,7 +265,7 @@ border-radius: 0;
 													<td>
 														<div class="form-focus select-focus">
 															<label class="control-label"></label>
-															<input class="time_select" id="comments#{{$value['date']}}" name="comments#{{$value['date']}}"   type="text" placeholder=""/>
+															<input class="time_select" disabled id="comments#{{$value['date']}}" name="comments#{{$value['date']}}"   type="text" placeholder=""/>
 															
 														</div>
 													</td>
@@ -276,7 +278,13 @@ border-radius: 0;
 											@foreach($data['date'] as $key=>$value)
 												<td>
 													<div class="">
-													<button class="btn btn2 btn-primary submit" id="submit#{{$value['date']}}"  name="submit#{{$value['date']}}">Save</button>
+														<?php if(strtotime($value['date'])>strtotime(date('d-m-Y'))){
+            
+										                $disabled="disabled";
+										            }else{
+										                $disabled = '';
+										            } ?>
+													<button class="btn btn2 btn-primary submit" disabled id="submit#{{$value['date']}}" {{$disabled}}  name="submit#{{$value['date']}}">Save</button>
 													
 													</div>
 												</td>
@@ -457,7 +465,7 @@ border-radius: 0;
 
 		
 			
-			function open_attendance_modal(text,employee_id,node){
+			function open_attendance_modal(text,employee_id,node,last_date,prev_week_sunday,prev_week_monday){
 				
 				$("#name_employee_id >h4").text(text);
 				$("#name").val(text);
@@ -465,6 +473,31 @@ border-radius: 0;
 				$("#node").val(node);
 				$("#employee_id").val(employee_id);
 				$("#employee_name").val(text);
+				$.ajax({
+		    		headers: {
+		                		'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+		             		},
+	            async: false,
+    			url: '{{route("firstDiv")}}',
+    			type: 'POST',
+    			dataType:'html',
+    			data: {text:text,employee_id:employee_id,last_date:last_date,prev_week_sunday:prev_week_sunday,prev_week_monday:prev_week_monday},
+    			beforeSend:function(){
+    				$(".loader").show();	
+    			},
+    			success:function(data){
+    				$(".loader").hide();
+    				$("#main_div").html('').html(data);
+    			}
+			}).fail(function(data){
+			// var response = JSON.parse(data.responseText);
+			// $.each(response.errors, function(index, val) {
+			// 	 // $("input[name='"+index+"']").next('div .alert-danger').empty().append('<div class=alert-danger><p>'+val+'</p></div>');
+			// 	 $("input[name='"+index+"#"+arr[1]+"']").next('div .alert-danger').remove();
+			// 	 $("input[name='"+index+"#"+arr[1]+"']").after('<div class=alert-danger><p>'+val+'</p></div>');
+			// 	 // $("textarea[name="+index+"]").after('<div class=alert-danger><p>'+val+'</p></div>');
+			// });
+		});
 			}
 	    
 	    $(document).on("click", "button.submit" , function() {
@@ -491,7 +524,7 @@ border-radius: 0;
 		    			data: {in_time:in_time,out_time:out_time,total_time:total_time,comments:comments,employee_id:employee_id,status:status,date:date},
 		    			success:function(data){
 		    				if(data =='1'){
-		    					alert("Arrendance added successfully");
+		    					alert("Attendance added successfully");
 		    				}
 		    			}
 	    			}).fail(function(data){
@@ -505,6 +538,8 @@ border-radius: 0;
 	    			});
             // console.log(status+" "+in_time+" "+out_time+" "+total_time+" "+comments+" "+employee_id+" "+date);
         });
+
+
 	  //   $("button[class^='submit']").on('click',function(){
 	 	// 	alert("Here");
 	 	// });		

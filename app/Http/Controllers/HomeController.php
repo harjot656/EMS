@@ -37,10 +37,14 @@ class HomeController extends Controller
         $value = $snapshot->getValue();
         $value = $reference->getValue(); 
         
-        
-        // echo "<pre>";print_r($value);
-        // die;
-        return view('index')->with('data',$value);
+        $last_employee_id = end($value);
+        $data['last_employee_id'] = isset($last_employee_id['last_numeric_employee_id'])?$last_employee_id['last_numeric_employee_id']:$last_employee_id['employee_id'];
+        if($data['last_employee_id'] >1000){
+            $data['last_employee_id'] = $data['last_employee_id'] + 1;
+        }else{
+           $data['last_employee_id'] = 1000 + (isset($last_employee_id['last_numeric_employee_id'])?$last_employee_id['last_numeric_employee_id']:$last_employee_id['employee_id']); 
+        }
+        return view('index',array('data'=>$value,'last_numeric_employee_id'=>$data['last_employee_id']));
     }
     public function holiday(Request $request){
         return view('holidays');
@@ -71,7 +75,7 @@ class HomeController extends Controller
          $database  = new FirebaseDb;
         
         // echo "<pre>";print_r($request->all());
-        
+        // die;
         $reference = $database->get_database()->getReference('employee');
         
             
@@ -84,7 +88,8 @@ class HomeController extends Controller
             'employee_id' => $request->employee_id,
             'joining_date' => $request->joining_date,
             'phone' => $request->phone,
-            'designation' => $request->designation
+            'designation' => $request->designation,
+            'last_numeric_employee_id' =>$request->last_numeric_employee_id
         ];
         
         $reference->push($postData);
@@ -103,7 +108,8 @@ class HomeController extends Controller
                        'employee_id'=>$request->employee_id,
                        'joining_date'=>$request->joining_date,
                        'designation'=>$request->designation,
-                       'phone'=>$request->phone
+                       'phone'=>$request->phone,
+                       'last_numeric_employee_id' =>$request->last_numeric_employee_id
                       ]);
         if($reference){
             return redirect()->back()->with('success','Employee edited successfully');
@@ -299,52 +305,75 @@ class HomeController extends Controller
     		$database  = new FirebaseDb;
 
     	    $data = $request->all();  
-            //echo "<pre>";print_r($data);die;      
+            if(($data['status'] == 'absent') || ($data['status'] == 'sick') ||($data['status'] == 'vacation')){
+                 $validator = Validator::make($data, [
+                            'date' => 'required',
+                            // 'comments' =>'required'
+                        ]);
+            if ($validator->fails())
+                {
+                    return Response::json(array(
+                        'success' => false,
+                        'errors' => $validator->getMessageBag()->toArray()
+
+                    ), 400);
+                    //return response()->json(['errors'=>$validator->errors()->all()]);
+                }else{
+                    $in_time = '';$out_time = '';
+                    $reference = $database->get_database()->getReference('employee_attendance/'.$data['employee_id'].'/'.$data['date'].'')->set([
+                           'name' => 'Attendance',
+                           'in-time'=>$in_time,
+                           'out-time'=>$out_time,
+                           'comments'=>(isset($data['comments']) && $data['comments']!='')?$data['comments']:'',
+                           'shift_hours'=>'',
+                           'status'=>$data['status']
+                          ]);
+                    if($reference){
+                        return '1';
+                    }
+                }     
+
+            }else{
+                $validator = Validator::make($data, [
+                            'date' => 'required',
+                            'in_time' => 'required',
+                            'out_time' => 'required',
+                            'comments' =>'required',
+                            'total_time'=>'required',
+                        ]);
+                if ($validator->fails())
+                {
+                    return Response::json(array(
+                        'success' => false,
+                        'errors' => $validator->getMessageBag()->toArray()
+
+                    ), 400);
+                    //return response()->json(['errors'=>$validator->errors()->all()]);
+                }
+                else
+                {
+                   
+                    $in_time = $data['in_time'];
+                    $out_time = $data['out_time'];
+                    $reference = $database->get_database()->getReference('employee_attendance/'.$data['employee_id'].'/'.$data['date'].'')->set([
+                           'name' => 'Attendance',
+                           'in-time'=>date('d-m-Y').' '.$in_time,
+                           'out-time'=>date('d-m-Y').' '.$out_time,
+                           'comments'=>$data['comments'],
+                           'shift_hours'=>$data['total_time'],
+                           'status'=>$data['status']
+                          ]);
+                    if($reference){
+                        return '1';
+                    }
+                }
+            }     
 		    // $myValue=  array();
 		    // parse_str($data['param1'], $myValue);
 		 
 		    // $myValue['attendance_date'] = str_replace('/', '-', $myValue['attendance_date']);
 		    
-		    $validator = Validator::make($data, [
-	            'date' => 'required',
-	            'in_time' => 'required',
-	            'out_time' => 'required',
-	            'comments' =>'required',
-                'total_time'=>'required',
-        	]);
-        	if ($validator->fails())
-	        {
-	        	return Response::json(array(
-			        'success' => false,
-			        'errors' => $validator->getMessageBag()->toArray()
 
-			    ), 400);
-	            //return response()->json(['errors'=>$validator->errors()->all()]);
-	        }
-	        else
-	        {
-                // echo "<pre>";print_r($data);die;
-	        	$in_time = $data['in_time'];
-	        	$out_time = $data['out_time'];
-
-	   //      	$datetime1 = new \DateTime($in_time);
-				// $datetime2 = new \DateTime($out_time);
-				// $interval = $datetime1->diff($datetime2);
-				// $difference = $interval->format('%h')." Hours ".$interval->format('%i')." Minutes";
-				
-	        	// echo $myValue['employee_id'];die;
-	        	$reference = $database->get_database()->getReference('employee_attendance/'.$data['employee_id'].'/'.$data['date'].'')->set([
-				       'name' => 'Attendance',
-				       'in-time'=>date('d-m-Y').' '.$in_time,
-				       'out-time'=>date('d-m-Y').' '.$out_time,
-				       'comments'=>$data['comments'],
-				       'shift_hours'=>$data['total_time'],
-                       'status'=>$data['status']
-				      ]);
-	        	if($reference){
-	        		return '1';
-	        	}
-	        }
 		   
     }
 
@@ -505,7 +534,14 @@ class HomeController extends Controller
         $html.="</tr>";
         $html.="<tr><td></td>";
         foreach($data['date'] as $key=>$value){
-            $html .="<td><div class=''><button class='btn btn2 btn-primary submit' name='submit' id=submit#".$value['date']."  name=submit#".$value['date'].">Save</button></div></td>";
+            echo "<pre>";print_r($value);die;
+            if(strtotime($value['date'])>strtotime(date('d-m-Y'))){
+                echo "Here";
+                $disabled="disabled";
+            }else{
+                $disabled = '';
+            }
+            $html .="<td><div class=''><button class='btn btn2 btn-primary submit' ".$disabled." name='submit' id=submit#".$value['date']."  name=submit#".$value['date'].">Save</button></div></td>";
         }
         $html.="<input type=hidden name=employee_id id=employee_id value=".$data['employee_id']."><input type=hidden name=employee_name id=employee_name value=".$data['employee_name']."><input type=hidden name=last_date id=last_date value=".$data['last_date']."><input type=hidden name=prev_week_sunday id=prev_week_sunday value=".$data['prev_week_sunday']."><input type=hidden name=prev_week_monday id=prev_week_monday value=".$data['prev_week_monday']."></tr></tbody></table></div>";
         return $html;                                   

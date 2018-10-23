@@ -1,6 +1,11 @@
  @extends('layouts.master')
  @section('content')
-
+<style type="text/css">
+	#designation{
+    width: 100%;
+    padding: 10px 5px;
+}
+</style>
    <div class="page-wrapper">
                 <div class="content container-fluid">
 					<div class="row">
@@ -54,11 +59,10 @@
 											<td>{{$value['joining_date']}}</td>
 											<td class="text-right">
 												<div class="dropdown">
-													<a href="#" class="action-icon dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-ellipsis-v"></i></a>
-													<ul class="dropdown-menu pull-right">
-														<li><a href="#" data-toggle="modal" data-target="#edit_employee" onclick="edit_employeee({{$value['employee_id']}},'{{$value['designation']}}','{{$value['first_name']}}','{{$value['last_name']}}','{{$value['email']}}',{{$value['phone']}},'{{$value['joining_date']}}','{{$key}}');"><i class="fa fa-pencil m-r-5"></i> Edit</a></li>
-														<li><a href="Javascript:void(0);" data-toggle="modal"  onclick="if(confirm('Are you sure you want to remove this user?')){event.stopPropagation(); event.preventDefault(); remove_user('{{$key}}');}else{event.stopPropagation(); event.preventDefault();}"><i class="fa fa-trash-o m-r-5"></i> Delete</a></li>
-													</ul>
+													
+													<a href="#" class="action-icon" data-toggle="modal" title="Edit" data-target="#edit_employee" onclick="edit_employeee('{{$value['employee_id']}}','{{$value['designation']}}','{{$value['first_name']}}','{{$value['last_name']}}','{{$value['email']}}',{{$value['phone']}},'{{$value['joining_date']}}','{{$key}}');"><i class="fa fa-pencil m-r-5"></i> </a>
+													<a href="Javascript:void(0);" class="action-icon" data-toggle="modal" title="Delete"  onclick="if(confirm('Are you sure you want to remove this user?')){event.stopPropagation(); event.preventDefault(); remove_user('{{$key}}');}else{event.stopPropagation(); event.preventDefault();}"><i class="fa fa-trash-o m-r-5"></i> </a>
+													
 												</div>
 											</td>
 										</tr>
@@ -296,13 +300,13 @@
 									<div class="col-sm-6">
 										<div class="form-group">
 											<label class="control-label">First Name <span class="text-danger">*</span></label>
-											<input class="form-control" type="text" name="first_name">
+											<input class="form-control add-name" type="text" name="first_name">
 										</div>
 									</div>
 									<div class="col-sm-6">
 										<div class="form-group">
 											<label class="control-label">Last Name</label>
-											<input class="form-control" type="text" name="last_name">
+											<input class="form-control add-name" type="text" name="last_name">
 										</div>
 									</div>
 									<!-- <div class="col-sm-6">
@@ -332,13 +336,13 @@
 									<div class="col-sm-6">  
 										<div class="form-group">
 											<label class="control-label">Employee ID <span class="text-danger">*</span></label>
-											<input type="text" class="form-control" name="employee_id">
+											<input type="text" class="form-control" name="employee_id" id="add_employee_id" readonly>
 										</div>
 									</div>
 									<div class="col-sm-6">  
 										<div class="form-group">
 											<label class="control-label">Joining Date <span class="text-danger">*</span></label>
-											<div class="cal-icon"><input class="form-control datetimepicker" type="text" name="joining_date"></div>
+											<div class=""><input class="form-control datetimepicker" type="text" name="joining_date"></div>
 										</div>
 									</div>
 									<div class="col-sm-6">
@@ -359,15 +363,15 @@
 									<div class="col-sm-6">
 										<div class="form-group">
 											<label class="control-label">Designation</label>
-											<select class="select" name="designation">
-												<option>Web Developer</option>
-												<option>Web Designer</option>
-												<option>SEO Analyst</option>
+											<select class="" name="designation" id="designation">
+												<option value="Manager">Manager</option>
+												<option value="Associate">Associate</option>
 											</select>
 										</div>
 									</div>
 								</div>
-								
+								<input type="hidden" id="last_numeric_employee_id" name="last_numeric_employee_id" value="{{@$last_numeric_employee_id}}">
+								<input type="hidden" id="last_employee_id" name="last_employee_id" value="{{@$last_employee_id}}">
 								<div class="m-t-20 text-center">
 									<button class="btn btn-primary" id="create_employee">Create Employee</button>
 								</div>
@@ -426,13 +430,13 @@
 									<div class="col-sm-6">  
 										<div class="form-group">
 											<label class="control-label">Employee ID <span class="text-danger">*</span></label>
-											<input type="text" class="form-control" id="employee_id" name="employee_id">
+											<input type="text" class="form-control" id="employee_id" readonly name="employee_id">
 										</div>
 									</div>
 									<div class="col-sm-6">  
 										<div class="form-group">
 											<label class="control-label">Joining Date <span class="text-danger">*</span></label>
-											<div class="cal-icon"><input class="form-control datetimepicker" id="joining_date" type="text" name="joining_date"></div>
+											<div class=""><input class="form-control datetimepicker" id="joining_date" type="text" name="joining_date"></div>
 										</div>
 									</div>
 									<div class="col-sm-6">
@@ -453,13 +457,13 @@
 									<div class="col-sm-6">
 										<div class="form-group">
 											<label class="control-label">Designation</label>
-											<select class="select" name="designation" id="designation">
-												<option value="Web Developer">Web Developer</option>
-												<option value="Web Designer">Web Designer</option>
-												<option value ="SEO Analyst">SEO Analyst</option>
+											<select class="" id="designation" name="designation">
+												<option value="Manager">Manager</option>
+												<option value="Associate">Associate</option>
 											</select>
 										</div>
 									</div>
+									<input type="hidden" id="last_numeric_employee_id" name="last_numeric_employee_id" value="{{@$last_numeric_employee_id}}">
 								</div>
 								<input type="hidden" name="node" id="node_val">
 								<div class="m-t-20 text-center">
@@ -489,17 +493,38 @@
 			</div>
         </div>
 		<div class="sidebar-overlay" data-reff="#sidebar"></div>
-
+		<input type="hidden" id="last_numeric_employee_id" name="last_numeric_employee_id" value="{{@$last_numeric_employee_id}}">
+		<input type="hidden" id="last_employee_id" name="last_employee_id" value="{{@$last_employee_id}}">
 		@endsection
 @section('local_script')
 	<script type="text/javascript">
+		$("input:text.add-name").on('change',function(){
+			var attr = $(this).attr('name');
+			if(attr =='first_name'){
+				var last_name = $('input:text[name="last_name"]').val();
+				var first_name = $(this).val();
+			}else{
+				var first_name = $('input:text[name="first_name"]').val();
+				var last_name = $(this).val();
+			}
+			if(first_name!='' && last_name !=''){
+				var substr = first_name.substring(0, 1);
+				var substr2 = last_name.substring(0, 1);
+				var employee_id = substr+substr2+$("#last_numeric_employee_id").val();
+				$("#add_employee_list input[name='employee_id']").val(employee_id);
+
+			}
+
+		});
+
 		function edit_employeee(employee_id,desig,f_name,l_name,email,phone,joining_date,node){
 			$("#first_name").val(f_name);
 			$("#last_name").val(l_name);
 			$("#email").val(email);
 			$("#phone").val(phone);
 			$("#employee_id").val(employee_id);
-			$("#designation").val(desig);
+			// $("#designationn").val(desig);
+			$('select[name^="designation"] option[value="'+desig+'"]').attr("selected","selected");
 			$("#joining_date").val(joining_date);
 			$("#node_val").val(node);
 		}

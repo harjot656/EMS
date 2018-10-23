@@ -44,3 +44,5 @@ Route::post('saveAttendance2','HomeController2@saveAttendance2')->name('saveAtte
 Route::post('prevNextWeek2','HomeController2@prevNextWeek2');
 Route::post('editEmployee','HomeController@editEmployee')->name('editEmployee');
 Route::post('removeEmployee','HomeController@removeEmployee')->name('removeEmployee');
+
+Route::post('firstDiv','HomeController2@firstDiv')->name('firstDiv');

@@ -1,3 +1,49 @@
+$(document).on('change','select.status_presence',function(){
+	var value = $(this).val();
+	var name = $(this).attr('name');
+	var arr = name.split("#");
+	var date2 = arr[1];
+	var newdate = date2.split("-").reverse().join("-");
+	var d1 = new Date(); ////// Current Date
+	var d2 = new Date(newdate);
+	if(d1>d2){  ///when selected date is lesser than current date 
+		if(value.toLowerCase() =='present'){
+				
+			$("input[name='in_time#"+arr[1]+"']").attr('disabled',false).val("");
+			$("input[name='out_time#"+arr[1]+"']").attr('disabled',false).val("");
+			$("input[name='total_time#"+arr[1]+"']").attr('disabled',false).val("");
+			$("input[name='comments#"+arr[1]+"']").attr('disabled',false).val("");
+			$("button[name='submit#"+arr[1]+"']").attr('disabled', false);
+		}else if(((value.toLowerCase() =='absent')||((value.toLowerCase() =='sick')) || ((value.toLowerCase() =='vacation'))) ){
+			$("input[name='comments#"+arr[1]+"']").attr('disabled',false).val("");	
+			$("input[name='in_time#"+arr[1]+"']").attr('disabled',true).val("");
+			$("input[name='out_time#"+arr[1]+"']").attr('disabled',true).val("");
+			$("input[name='total_time#"+arr[1]+"']").attr('disabled',true).val("");
+			$("button[name='submit#"+arr[1]+"']").attr('disabled',false);
+		}else if(value.toLowerCase() =='weekend'){
+			$("input[name='in_time#"+arr[1]+"']").attr('disabled',false).val("");
+			$("input[name='out_time#"+arr[1]+"']").attr('disabled',false).val("");
+			$("input[name='total_time#"+arr[1]+"']").attr('disabled',false).val("");
+			$("input[name='comments#"+arr[1]+"']").attr('disabled',false).val("");
+			$("button[name='submit#"+arr[1]+"']").attr('disabled', false);
+		}
+		else{
+			$("input[name='in_time#"+arr[1]+"']").attr('disabled',true).val("");
+			$("input[name='out_time#"+arr[1]+"']").attr('disabled',true).val("");
+			$("input[name='total_time#"+arr[1]+"']").attr('disabled',true).val("");
+			$("input[name='comments#"+arr[1]+"']").attr('disabled',true).val("");
+			$("button[name='submit#"+arr[1]+"']").attr('disabled', true);
+		}
+	}else { /// else 
+	console.log("Hereee");
+	}
+	// console.log(value);
+
+
+
+});
+
+
 $("#next_week").on('click',function(e){
 	$(".loader").show();
 var week = 'next_week';
