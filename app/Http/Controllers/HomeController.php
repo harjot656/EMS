@@ -70,8 +70,180 @@ class HomeController extends Controller
     public function addEmployee(Request $request){
         return view('add_employee');
     }
+    public function generateReport(Request $request){
+        $database  = new FirebaseDb;
+        $reference = $database->get_database()->getReference('employee');
+        $snapshot = $reference->getSnapshot();
+        $data['value'] = $snapshot->getValue();
+       for ($m=1; $m<=date('m'); $m++) {
+         $data['date'][] = date('F', mktime(0,0,0,$m, 1, date('Y')));
+         
+         }
+         $daat['currently_selected'] = date('Y');
+         $data['earliest_year'] = 1950;
+         $data['latest_year'] = date('Y'); 
+         
+        return view('generate_report')->with('data',$data);
+    }
+
+    public function get_report(Request $request){
+    	$dataa = $request->all();        
+	    $data =  array();
+	    parse_str($dataa['param1'], $data);
+     //     echo "<pre>";print_r($myValue);die;
+	    // print_r($myValue);
+    	$date_arr =[];
+        if((isset($data['from_date']) && $data['from_date']!='') && (isset($data['to_date']) && $data['to_date']!='')){  //////////////If User Has Selected From and To Date
+            $date_from = strtotime($data['from_date']);   
+            $date_to = strtotime($data['to_date']);
+            for ($i=$date_from; $i<=$date_to; $i+=86400) {  
+                $date_arr[] = date("d-m-Y", $i);  
+            }
+        }else if(isset($data['week']) && $data['week']!=''){  //////////  For Range of week 
+            $arr = explode(' ',$data['week']);
+            if($arr[0]==$arr[2]){
+             $date_arr[] = $arr[0];   
+            }else{
+                $date_from = strtotime($arr[0]);   
+                $date_to = strtotime($arr[2]);
+                for ($i=$date_from; $i<=$date_to; $i+=86400) {  
+                    $date_arr[] = date("d-m-Y", $i);  
+                }
+            }    
+            // $pos = strrpos($request->week, ' ');
+            // $first = substr($string, 0, $pos);
+            // $second = substr($string, $pos + 1)
+
+        }else if(isset($data['month_by']) && $data['month_by']!=''){  //////////  For Entire Month
+            $year = date('Y');
+            $monthname =  $data['month_by'];
+            $monthnum = date("n", strtotime("01-".$monthname."-2011 00:00:00"));
+            for($d=1; $d<=31; $d++)
+			{
+			    $time=mktime(12, 0, 0, $monthnum, $d, $year);          
+			    if (date('m', $time)==$monthnum)       
+			        $date_arr[] = date('d-m-Y', $time);
+			}
+        }else if(isset($data['year']) && $data['year']!=''){
+        	if($data['year'] ==date('Y')) $number = date('n',strtotime(date('d-m-Y')));else $number = 12;
+        	for ($i=1; $i <=$number; $i++) { 
+        		for ($j=1; $j <=31; $j++) { 
+        			$time=mktime(12, 0, 0, $i, $j, $data['year']);          
+			    	if (date('m', $time)==$i)       
+			        $date_arr[] = date('d-m-Y', $time);
+        		}
+        	}
+        }
+        // echo "<pre>";print_r($request->all());die;
+        if($data['report_by'] =='all_employees'){
+        	
+            $database  = new FirebaseDb;
+            $reference = $database->get_database()->getReference('employee');
+            $snapshot = $reference->getSnapshot();
+            $data['employee_list'] = $snapshot->getValue();
+            $reference2 = $database->get_database()->getReference('employee_attendance');
+            $snapshot2 = $reference2->getSnapshot()->getValue();
+			$i = 0;
+            $present = 0;         
+			foreach($snapshot2 as $key=>$value){
+				foreach ($date_arr as $keyy => $valuee){
+					//echo"<pre>";print_r($value);die;
+					if(array_key_exists($valuee, $value)){
+            		$present = $present + 1;
+            		$attendance_arr[$i]['date'] = $valuee;
+            		$attendance_arr[$i]['in_time'] = $value[$valuee]['in-time'];
+            		$attendance_arr[$i]['out_time'] = $value[$valuee]['out-time'];
+            		$attendance_arr[$i]['status'] = $value[$valuee]['status'];
+            		$attendance_arr[$i]['shift_hours'] = $value[$valuee]['shift_hours'];
+            		$attendance_arr[$i]['comments'] = $value[$valuee]['comments'];
+            	}else{
+            		$attendance_arr[$i]['date'] = $valuee;
+            		$attendance_arr[$i]['in_time'] = '-';
+            		$attendance_arr[$i]['out_time'] = '-';
+            		$attendance_arr[$i]['status'] = '-';
+            		$attendance_arr[$i]['shift_hours'] = '-';
+            		$attendance_arr[$i]['comments'] = '-';
+            	}
+				$i++;
+				}
+				
+			}
+			echo "<pre>";print_r($attendance_arr);die;
+            foreach($data['employee_list'] as $key=>$value){
+             if(array_key_exists($value['employee_id'], $snapshot2)){
+               $employee_attendance_arr[] =  $snapshot2[$value['employee_id']];
+               // echo "<pre>";
+
+             }
+            }
+            echo "In If";
+            die;
+            // print_r($request->all());
+            // print_r($data);
+            // print_r($snapshot2);
+            // die;
+        }
+        else if(isset($data['report_byy']) && $data['report_byy']!='')
+        {
+        	$employee_detail = [];
+        	$database  = new FirebaseDb;
+            $reference = $database->get_database()->getReference('employee');
+            $snapshot = $reference->getSnapshot();
+            $data['employee_list'] = $snapshot->getValue();
+            $reference2 = $database->get_database()->getReference('employee_attendance/'.$data['report_byy'].'');
+            $data['employee_attendance'] = $reference2->getSnapshot()->getValue();
+             foreach($data['employee_list'] as $key=>$value){
+				 if($value['employee_id'] ==$data['report_byy']){
+					 $employee_detail = $value;
+				 }
+			 }
+  //           echo "<pre>";
+//             print_r($employee_detail);die;
+            $i = 0;
+            $present = 0;
+            foreach ($date_arr as $key => $value) {
+            	$j=0;
+            	if(array_key_exists($value, $data['employee_attendance'])){
+            		$present = $present + 1;
+            		$attendance_arr[$i]['date'] = $value;
+            		$attendance_arr[$i]['in_time'] = $data['employee_attendance'][$value]['in-time'];
+            		$attendance_arr[$i]['out_time'] = $data['employee_attendance'][$value]['out-time'];
+            		$attendance_arr[$i]['status'] = $data['employee_attendance'][$value]['status'];
+            		$attendance_arr[$i]['shift_hours'] = $data['employee_attendance'][$value]['shift_hours'];
+            		$attendance_arr[$i]['comments'] = $data['employee_attendance'][$value]['comments'];
+            	}else{
+            		$attendance_arr[$i]['date'] = $value;
+            		$attendance_arr[$i]['in_time'] = '-';
+            		$attendance_arr[$i]['out_time'] = '-';
+            		$attendance_arr[$i]['status'] = '-';
+            		$attendance_arr[$i]['shift_hours'] = '-';
+            		$attendance_arr[$i]['comments'] = '-';
+            	}
+            	$i++;
+            }
+            // echo "<pre>";print_r($attendance_arr);die;
+            // echo $present.' '.count($date_arr);die;
+            if($present !=0){
+            	if(isset($data['month_by']) && $data['month_by']!=''){
+            	$attendance_arr['monthly_average'] = ceil($present/(count($date_arr)));            		
+            	}else if(isset($data['year']) && $data['year']!=''){
+            	$attendance_arr['yearly_average'] = ceil($present/(count($date_arr)));	
+            	}
+            	
+            }
+            $html='';
+            $html.="<div class='content container-fluid'><div class='row'><div class='col-lg-12'> <div class='col-md-2 user-info'><h3>Name:".$employee_detail['first_name']." ".$employee_detail['last_name']."</h3></div><div class='col-md-2 user-info'><h3>Avrage Hours</h3></div> </div><div class='col-lg-12'><div class='table-responsive'><table class='table table-striped custom-table m-b-0'><thead><tr><th>Date</th><th>Status</th><th>In-Time</th><th>Out-Time</th><th>Shift Hours</th><th>Comments</th></tr></thead><tbody><tr><td></td><td ></td><td></td><td></td><td></td><td></td></tr></tbody></table></div><div class='table-responsive' style='height: 400px;'><table class='table table-striped custom-table m-b-0'><tbody>";
+				foreach($attendance_arr as $key=>$value){
+
+					$html.="<tr><td>".$value['date']."</td><td title=".ucwords($value['status']).">".ucwords($value['status'])."</td><td title='".ucwords($value['in_time'])." ' >".ucwords($value['in_time'])."</td><td title='".ucwords($value['out_time'])."'>".ucwords($value['out_time'])."</td><td>".$value['shift_hours']."</td><td>".$value['comments']."</td></tr>";
+				}
+				$html.="</tbody></table></div></div></div></div>";							
+            return $html;   
+        }
+        echo "<pre>";print_r($request->all());die;
+    }
     public function saveEmployee(Request $request){
-        
+            
          $database  = new FirebaseDb;
         
         // echo "<pre>";print_r($request->all());

@@ -65,7 +65,8 @@
 							<li><a href="{{route('designations')}}">Designations</a></li> -->
 							<li><a href="{{route('add-attendance3')}}">Attendance</a></li>
 							<!-- <li><a href="javascript:void(0);">Departments</a></li> -->
-							<li><a href="javascript:void(0);">Designations</a></li>
+							<!-- <li><a href="javascript:void(0);">Designations</a></li> -->
+							<li><a href="{{route('generate-report')}}">Generate Report</a></li>
 							
 						</ul>
 						

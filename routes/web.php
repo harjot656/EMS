@@ -28,6 +28,7 @@ Route::get('designations','HomeController@showDesignation')->name('designations'
 Route::get('profile','HomeController@getProfile')->name('profile');
 Route::get('edit-profile','HomeController@editProfile')->name('edit-profile');
 // Route::get('add-employee','HomeController@addEmployee')->name('add-employee');
+Route::get('generate_report','HomeController@generateReport')->name('generate-report');
 
 Route::post('saveEmployee','HomeController@saveEmployee')->name('saveEmployee');
 Route::post('performLogin','HomeController@performLogin')->name('performLogin');
@@ -44,5 +45,7 @@ Route::post('saveAttendance2','HomeController2@saveAttendance2')->name('saveAtte
 Route::post('prevNextWeek2','HomeController2@prevNextWeek2');
 Route::post('editEmployee','HomeController@editEmployee')->name('editEmployee');
 Route::post('removeEmployee','HomeController@removeEmployee')->name('removeEmployee');
+
+Route::post('get_report','HomeController@get_report')->name('get_report');
 
 Route::post('firstDiv','HomeController2@firstDiv')->name('firstDiv');
