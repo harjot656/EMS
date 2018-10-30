@@ -17,7 +17,9 @@
 .user-info {
     padding: 20px 10px;
 }
-
+.select2-container--open .select2-dropdown {
+    top: -30px;
+}
  </style>
 
  	
@@ -108,7 +110,7 @@
                     </div>
 					<div class="row">
 						<div class="m-t-20 text-center">
-							<button id="gen_rpt" class="btn btn-primary">Genrate Report</button>
+							<button id="gen_rpt" class="btn btn-primary">Generate Report</button>
 						</div>
 					</div>
 				</form>			
@@ -126,6 +128,8 @@
 	$("#employee,#specify-month,#specify-year").select2();
 	// $(".floating").select2();
 	$(document).ready(function() {
+
+
 		$(".datetimepickerr").datetimepicker({
 		 format: 'DD-MM-YYYY',
 		 useCurrent: false,
@@ -135,10 +139,14 @@
 		$("input[type='text']").attr('disabled',true);
 		$("select[id='specify-month']").attr('disabled',true);
 		$("select[id='specify-year']").attr('disabled',true);
+		$("select[name='report_byy']").attr('disabled',true);
 	});
 	$("input[type='radio']").on('click',function(){
 		var id = $(this).attr('id');
 		console.log($(this).attr('id'));
+		if(id =='all_emp'){$("select[name='report_byy']").attr('disabled',true).val("");}else if(id=='select_emp'){
+			$("select[name='report_byy']").attr('disabled',false);
+		}
 		if(id!='select_emp'||id!='all_emp'){
 			var arr = id.split('-');
 			if(arr[1] == 'd'){
@@ -175,36 +183,36 @@
 		}
 	});
 
-	$("#gen_rpt").on('click',function(e){
-		console.log($("#generate_report").valid());
-		if($("#generate_report").valid()){
-			e.preventDefault();
-			$.ajax({
-				headers: {
-			        'X-CSRF-TOKEN': $('input[name="_token"]').val()
-			    },
-				url: '{{route("get_report")}}',
-				type: 'POST',
-				dataType:'html',
-				data: {param1: $("#generate_report").serialize()},
-			})
-			.done(function(data) {
-				$("#mainDiv").html('').html(data);
-				// console.log(data);
-				console.log("success");
-			})
-			.fail(function() {
-				console.log("error");
-			})
-			.always(function() {
-				console.log("complete");
-			});
+	// $("#gen_rpt").on('click',function(e){
+	// 	console.log($("#generate_report").valid());
+	// 	if($("#generate_report").valid()){
+	// 		e.preventDefault();
+	// 		$.ajax({
+	// 			headers: {
+	// 		        'X-CSRF-TOKEN': $('input[name="_token"]').val()
+	// 		    },
+	// 			url: '{{route("get_report")}}',
+	// 			type: 'POST',
+	// 			dataType:'html',
+	// 			data: {param1: $("#generate_report").serialize()},
+	// 		})
+	// 		.done(function(data) {
+	// 			$("#mainDiv").html('').html(data);
+	// 			// console.log(data);
+	// 			console.log("success");
+	// 		})
+	// 		.fail(function() {
+	// 			console.log("error");
+	// 		})
+	// 		.always(function() {
+	// 			console.log("complete");
+	// 		});
 			
-		}
+	// 	}
 
 		
 		
-	});
+	// });
 	$("#specify-week").daterangepicker({
 		locale: {
       format: 'DD-MM-YYYY',

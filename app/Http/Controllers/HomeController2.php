@@ -105,6 +105,8 @@ class HomeController2 extends Controller
         $snapshot = $reference->getSnapshot();
         $value = $snapshot->getValue();
         
+        echo "<pre>";print_r($value);die;
+
         foreach($value as $key => $val)
         {
             $user = $val['username'];
@@ -211,21 +213,23 @@ class HomeController2 extends Controller
             $year = date('Y');
         }
         
-
-        for($d=0; $d<31; $d++)
+        // echo date('t');die;
+        for($d=0; $d<=date('t'); $d++)
         {
             $time=mktime(12, 0, 0, $month, $d, $year);          
-            if (date('m', $time)==$month)       
+            if (date('m', $time)==$month){
                 $data['list_date'][]=date('d-m-Y', $time);
                 $data['attendance'][]=0;
                 $data['attendance_employee'][]=array();
+            }       
+                
                
         }
 
         // for($i=0;$i<count($data['list_date']);$i++){
 
         // }
-        // echo "<pre>";print_r($data);die;
+     
 
         $data['number_days'] = date('t');
         $data['value'] = $value;

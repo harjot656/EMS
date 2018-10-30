@@ -46,6 +46,7 @@ Route::post('prevNextWeek2','HomeController2@prevNextWeek2');
 Route::post('editEmployee','HomeController@editEmployee')->name('editEmployee');
 Route::post('removeEmployee','HomeController@removeEmployee')->name('removeEmployee');
 
-Route::post('get_report','HomeController@get_report')->name('get_report');
+Route::any('get_report','HomeController@get_report')->name('get_report');
+// Route::get('reportView','HomeController@reportView')->name('reportView');
 
 Route::post('firstDiv','HomeController2@firstDiv')->name('firstDiv');

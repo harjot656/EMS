@@ -17,6 +17,7 @@ use Validator;
 use Response;
 use Carbon\Carbon;
 use DateTime;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class HomeController extends Controller
 {
@@ -87,9 +88,12 @@ class HomeController extends Controller
     }
 
     public function get_report(Request $request){
-    	$dataa = $request->all();        
-	    $data =  array();
-	    parse_str($dataa['param1'], $data);
+    	$data = $request->all();
+        if(!isset($data['report_by'])){
+            return redirect('generate_report');
+        }        
+	    // $data =  array();
+	    // parse_str($dataa['param1'], $data);
      //     echo "<pre>";print_r($myValue);die;
 	    // print_r($myValue);
     	$date_arr =[];
@@ -133,6 +137,8 @@ class HomeController extends Controller
 			        $date_arr[] = date('d-m-Y', $time);
         		}
         	}
+        }else{
+            return redirect()->back();
         }
         // echo "<pre>";print_r($request->all());die;
         if($data['report_by'] =='all_employees'){
@@ -144,44 +150,57 @@ class HomeController extends Controller
             $reference2 = $database->get_database()->getReference('employee_attendance');
             $snapshot2 = $reference2->getSnapshot()->getValue();
 			$i = 0;
-            $present = 0;         
-			foreach($snapshot2 as $key=>$value){
-				foreach ($date_arr as $keyy => $valuee){
-					//echo"<pre>";print_r($value);die;
-					if(array_key_exists($valuee, $value)){
-            		$present = $present + 1;
-            		$attendance_arr[$i]['date'] = $valuee;
-            		$attendance_arr[$i]['in_time'] = $value[$valuee]['in-time'];
-            		$attendance_arr[$i]['out_time'] = $value[$valuee]['out-time'];
-            		$attendance_arr[$i]['status'] = $value[$valuee]['status'];
-            		$attendance_arr[$i]['shift_hours'] = $value[$valuee]['shift_hours'];
-            		$attendance_arr[$i]['comments'] = $value[$valuee]['comments'];
-            	}else{
-            		$attendance_arr[$i]['date'] = $valuee;
-            		$attendance_arr[$i]['in_time'] = '-';
-            		$attendance_arr[$i]['out_time'] = '-';
-            		$attendance_arr[$i]['status'] = '-';
-            		$attendance_arr[$i]['shift_hours'] = '-';
-            		$attendance_arr[$i]['comments'] = '-';
-            	}
-				$i++;
-				}
-				
-			}
-			echo "<pre>";print_r($attendance_arr);die;
+            $present = 0;
+            $all_employee_attendance = array();
+              // echo "<pre>";print_r($data['employee_list']); die; 
             foreach($data['employee_list'] as $key=>$value){
-             if(array_key_exists($value['employee_id'], $snapshot2)){
-               $employee_attendance_arr[] =  $snapshot2[$value['employee_id']];
-               // echo "<pre>";
-
-             }
+                $reference3 = $database->get_database()->getReference('employee_attendance/'.$value['employee_id'].'');
+                $snapshot3 = $reference3->getSnapshot()->getValue();
+                $all_employee_list[][$value['first_name'].' '.$value['last_name']]['attendance'] = $snapshot3;
+                // $all_employee_list[][$value['employee_id']]['attendance'] =   
             }
-            echo "In If";
-            die;
-            // print_r($request->all());
-            // print_r($data);
-            // print_r($snapshot2);
-            // die;
+           // echo "<pre>";print_r($all_employee_list); die;        
+			foreach($all_employee_list as $key=>$value){
+                foreach($value as $keyy=>$valuee){
+
+                        foreach ($date_arr as $keyyy => $valueee){
+                        
+                            if((isset($valuee)&& !empty($valuee['attendance']))){
+                                if( array_key_exists($valueee, $valuee['attendance'])){
+                                        $present = $present + 1;
+                                        $attendance_arr[$keyy]['attendance'][$i]['date'] = $valueee;
+                                        $attendance_arr[$keyy]['attendance'][$i]['in_time'] = $valuee['attendance'][$valueee]['in-time'];
+                                        $attendance_arr[$keyy]['attendance'][$i]['out_time'] = $valuee['attendance'][$valueee]['out-time'];
+                                        $attendance_arr[$keyy]['attendance'][$i]['status'] = $valuee['attendance'][$valueee]['status'];
+                                        $attendance_arr[$keyy]['attendance'][$i]['shift_hours'] = $valuee['attendance'][$valueee]['shift_hours'];
+                                        $attendance_arr[$keyy]['attendance'][$i]['comments'] = $valuee['attendance'][$valueee]['comments'];
+                                    }else{
+                                        $attendance_arr[$keyy]['attendance'][$i]['date'] = $valueee;
+                                        $attendance_arr[$keyy]['attendance'][$i]['in_time'] = '-';
+                                        $attendance_arr[$keyy]['attendance'][$i]['out_time'] = '-';
+                                        $attendance_arr[$keyy]['attendance'][$i]['status'] = '-';
+                                        $attendance_arr[$keyy]['attendance'][$i]['shift_hours'] = '-';
+                                        $attendance_arr[$keyy]['attendance'][$i]['comments'] = '-';
+                                    }
+                                }else{
+                                        $attendance_arr[$keyy]['attendance'][$i]['date'] = $valueee;
+                                        $attendance_arr[$keyy]['attendance'][$i]['in_time'] = '-';
+                                        $attendance_arr[$keyy]['attendance'][$i]['out_time'] = '-';
+                                        $attendance_arr[$keyy]['attendance'][$i]['status'] = '-';
+                                        $attendance_arr[$keyy]['attendance'][$i]['shift_hours'] = '-';
+                                        $attendance_arr[$keyy]['attendance'][$i]['comments'] = '-';
+                                }
+                            
+                            $i++;
+                        }
+                        
+                }
+				
+				$i=0;
+			}
+			// echo "<pre>";print_r($attendance_arr);die;
+            return view('report_view',['data'=>$attendance_arr]);
+          
         }
         else if(isset($data['report_byy']) && $data['report_byy']!='')
         {
@@ -194,63 +213,79 @@ class HomeController extends Controller
             $data['employee_attendance'] = $reference2->getSnapshot()->getValue();
              foreach($data['employee_list'] as $key=>$value){
 				 if($value['employee_id'] ==$data['report_byy']){
-					 $employee_detail = $value;
+					 $data['employee_detail'] = $value;
 				 }
 			 }
-  //           echo "<pre>";
-//             print_r($employee_detail);die;
+            $name = $data['employee_detail']['first_name'].' '.$data['employee_detail']['last_name'];
+            // echo "<pre>";print_r($data['employee_attendance']);die;
             $i = 0;
             $present = 0;
             foreach ($date_arr as $key => $value) {
             	$j=0;
-            	if(array_key_exists($value, $data['employee_attendance'])){
-            		$present = $present + 1;
-            		$attendance_arr[$i]['date'] = $value;
-            		$attendance_arr[$i]['in_time'] = $data['employee_attendance'][$value]['in-time'];
-            		$attendance_arr[$i]['out_time'] = $data['employee_attendance'][$value]['out-time'];
-            		$attendance_arr[$i]['status'] = $data['employee_attendance'][$value]['status'];
-            		$attendance_arr[$i]['shift_hours'] = $data['employee_attendance'][$value]['shift_hours'];
-            		$attendance_arr[$i]['comments'] = $data['employee_attendance'][$value]['comments'];
-            	}else{
-            		$attendance_arr[$i]['date'] = $value;
-            		$attendance_arr[$i]['in_time'] = '-';
-            		$attendance_arr[$i]['out_time'] = '-';
-            		$attendance_arr[$i]['status'] = '-';
-            		$attendance_arr[$i]['shift_hours'] = '-';
-            		$attendance_arr[$i]['comments'] = '-';
-            	}
+                if(!empty($data['employee_attendance'])){
+                if(array_key_exists($value, $data['employee_attendance'])){
+                    $present = $present + 1;
+                    $attendance_arr[$name]['attendance'][$i]['date'] = $value;
+                    $attendance_arr[$name]['attendance'][$i]['in_time'] = $data['employee_attendance'][$value]['in-time'];
+                    $attendance_arr[$name]['attendance'][$i]['out_time'] = $data['employee_attendance'][$value]['out-time'];
+                    $attendance_arr[$name]['attendance'][$i]['status'] = $data['employee_attendance'][$value]['status'];
+                    $attendance_arr[$name]['attendance'][$i]['shift_hours'] = $data['employee_attendance'][$value]['shift_hours'];
+                    $attendance_arr[$name]['attendance'][$i]['comments'] = $data['employee_attendance'][$value]['comments'];
+                }else{
+                    $attendance_arr[$name]['attendance'][$i]['date'] = $value;
+                    $attendance_arr[$name]['attendance'][$i]['in_time'] = '-';
+                    $attendance_arr[$name]['attendance'][$i]['out_time'] = '-';
+                    $attendance_arr[$name]['attendance'][$i]['status'] = '-';
+                    $attendance_arr[$name]['attendance'][$i]['shift_hours'] = '-';
+                    $attendance_arr[$name]['attendance'][$i]['comments'] = '-';
+                }    
+            }else{
+                $attendance_arr[$name]['attendance'][$i]['date'] = $value;
+                    $attendance_arr[$name]['attendance'][$i]['in_time'] = '-';
+                    $attendance_arr[$name]['attendance'][$i]['out_time'] = '-';
+                    $attendance_arr[$name]['attendance'][$i]['status'] = '-';
+                    $attendance_arr[$name]['attendance'][$i]['shift_hours'] = '-';
+                    $attendance_arr[$name]['attendance'][$i]['comments'] = '-';
+            }
+            	
             	$i++;
             }
-            // echo "<pre>";print_r($attendance_arr);die;
+            
             // echo $present.' '.count($date_arr);die;
+            $yearly_average = '';$monthly_average = '';
             if($present !=0){
             	if(isset($data['month_by']) && $data['month_by']!=''){
-            	$attendance_arr['monthly_average'] = ceil($present/(count($date_arr)));            		
+            	$monthly_average = ceil($present/(count($date_arr)));            		
             	}else if(isset($data['year']) && $data['year']!=''){
-            	$attendance_arr['yearly_average'] = ceil($present/(count($date_arr)));	
+            	$yearly_average = ceil($present/(count($date_arr)));	
             	}
             	
             }
-            $html='';
-            $html.="<div class='content container-fluid'><div class='row'><div class='col-lg-12'> <div class='col-md-2 user-info'><h3>Name:".$employee_detail['first_name']." ".$employee_detail['last_name']."</h3></div><div class='col-md-2 user-info'><h3>Avrage Hours</h3></div> </div><div class='col-lg-12'><div class='table-responsive'><table class='table table-striped custom-table m-b-0'><thead><tr><th>Date</th><th>Status</th><th>In-Time</th><th>Out-Time</th><th>Shift Hours</th><th>Comments</th></tr></thead><tbody><tr><td></td><td ></td><td></td><td></td><td></td><td></td></tr></tbody></table></div><div class='table-responsive' style='height: 400px;'><table class='table table-striped custom-table m-b-0'><tbody>";
-				foreach($attendance_arr as $key=>$value){
+           
 
-					$html.="<tr><td>".$value['date']."</td><td title=".ucwords($value['status']).">".ucwords($value['status'])."</td><td title='".ucwords($value['in_time'])." ' >".ucwords($value['in_time'])."</td><td title='".ucwords($value['out_time'])."'>".ucwords($value['out_time'])."</td><td>".$value['shift_hours']."</td><td>".$value['comments']."</td></tr>";
-				}
-				$html.="</tbody></table></div></div></div></div>";							
-            return $html;   
+            return view('report_view',['data'=>$attendance_arr,'yearly_average'=>$yearly_average,'monthly_average'=>$monthly_average]);
+              
         }
-        echo "<pre>";print_r($request->all());die;
+       return redirect()->back();
+        // echo "<pre>";print_r($request->all());die;
     }
     public function saveEmployee(Request $request){
             
          $database  = new FirebaseDb;
         
-        // echo "<pre>";print_r($request->all());
         // die;
         $reference = $database->get_database()->getReference('employee');
-        
-            
+        $reference2 = $database->get_database()->getReference('admin');
+        // echo "<pre>";print_r($reference2->getValue());
+
+        if(strtolower(trim($request->designation)) == 'manager'){
+            $postData2 = [
+                'username'=>$request->employee_id,
+                'password'=>$request->password
+            ];
+            $reference2->push($postData2);
+        }
+
         $postData  =   [
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
@@ -312,25 +347,24 @@ class HomeController extends Controller
         
         $snapshot = $reference->getSnapshot();
         $value = $snapshot->getValue();
-        
+        $incorrect = 0;
         foreach($value as $key => $val)
         {
-            $user = $val['username'];
-            $pass = $val['password'];
+            if($request->username == $val['username'])
+            {
+                $incorrect = $incorrect + 1;
+                if($request->password == $val['password'])
+                {
+                    return redirect('index');
+                }
+                else
+                {
+                   return redirect()->back()->withErrors(['errors'=>'Password is incorrect.']);
+                } 
+            }
         }
         
-        if($request->username == $val['username'])
-        {
-            if($request->password == $val['password'])
-            {
-                return redirect('index');
-            }
-            else
-            {
-               return redirect()->back()->withErrors(['errors'=>'Password is incorrect.']);
-            } 
-        }
-        else
+        if($incorrect ==0)
         {
                return redirect()->back()->withErrors(['errors'=>'Username does not exist.']);
         }

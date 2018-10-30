@@ -1,4 +1,5 @@
 $("#add_employee_list").validate({
+ignore: [],
 rules:{
 	first_name:{
 		required:true,
@@ -15,10 +16,10 @@ rules:{
 		required:true,
 		email:true
 	},
-	// password:{
-	// 	required:true,
-	// 	minlength:6
-	// },
+	password:{
+		required:true,
+		minlength:6
+	},
 	// confirm_password :{
  //        minlength : 5,
  //        equalTo : '[name="password"]'
@@ -28,7 +29,7 @@ rules:{
     },
     joining_date:{
     	required:true,
-    	date:true
+    	// date:true
     },
     phone:{
     	required:true,
@@ -40,11 +41,18 @@ rules:{
 }
 });
 
-$("#create_employee").on('click',function(e){
-// console.log($("#add_employee_list").valid());
-// e.preventDefault();
+
+$(document).on('click','#create_employee',function(){
+// alert($("#add_employee_list").valid());
 
 });
+
+// $("#create_employee").on('click',function(e){
+// 	alert("")
+// console.log($("#add_employee_list").valid());
+// // e.preventDefault();
+
+// });
 
 jQuery.validator.addMethod("lettersonly", function(value, element) {
   return this.optional(element) || /^[a-z]+$/i.test(value);
@@ -70,7 +78,7 @@ $("#edit_employeee").validate({
     	},
     	joining_date:{
 	    	required:true,
-	    	date:true
+	    	// date:true
     	},
     	phone:{
 	    	required:true,

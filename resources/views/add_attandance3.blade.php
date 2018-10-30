@@ -108,10 +108,12 @@ border-radius: 0;
 										<?php $arr= array(); ?>
 										@foreach($data['value'] as $key=>$value)
 										<tr>	
+											<?php //echo "<pre>"; echo count($data['list_date']); print_r($data['list_date']);die?>
 											<!-- <input type="hidden" name="last_date" id="last_date" value="{{@$data['last_date']}}">
 											<input type="hidden" name="prev_week_sunday" id="prev_week_sunday" value="{{@$data['prev_week_sunday']}}">
 											<input type="hidden" name="prev_week_monday" id="prev_week_monday" value="{{@$data['prev_week_monday']}}"> -->
 											<td><a href="#" onclick="open_attendance_modal(this.text,'{{$value['employee_id']}}',<?php echo "'$key'"; ?>,'{{@$data['last_date']}}','{{@$data['prev_week_sunday']}}','{{@$data['prev_week_monday']}}') "data-toggle="modal" data-target="#add_attendence">{{$value['first_name']}} {{''}} {{$value['last_name']}}</a></td>
+
 											@if(isset($value['attendance']))								
 												@foreach($value['attendance'] as $keyy=>$valuee)
 													<?php 
@@ -122,7 +124,7 @@ border-radius: 0;
 													 ?>
 													 
 												@endforeach
-												@for($j=0;$j<=(count($data['list_date']));$j++)
+												@for($j=0;$j<(count($data['list_date']));$j++)
 												<?php //echo "<pre>";print_r($data['attendance_employee']);die; ?>
 
 													@if($data['attendance'][$j] == 1)	
@@ -136,12 +138,20 @@ border-radius: 0;
 														<td title="{{$status}}{{$data['attendance_employee'][$j]['in-time']}}" ><?= $sign ?></td>
 														<?php $data['attendance'][$j] = 0; $data['attendance_employee'][$j] = array();?>
 												 	@else
-													<td title="#"><i class='fa fa-close text-danger'></i></td> 
+													 	@if(strtotime($data['list_date'][$j])<= strtotime(date('d-m-Y')))
+															<td title="#"><i class='fa fa-close text-danger'></i></td>
+														@else
+															<td title="#">N/A</td>
+														@endif
 													@endif
 												@endfor
 											@else
-												@for($j=0;$j<=(count($data['list_date']));$j++)
-													<td title="#"><i class='fa fa-close text-danger'></i></td>	 
+												@for($j=0;$j<(count($data['list_date']));$j++)
+													@if(strtotime($data['list_date'][$j])<= strtotime(date('d-m-Y')))
+														<td title="#"><i class='fa fa-close text-danger'></i></td>
+													@else
+														<td title="#">N/A</td>
+													@endif	 
 												@endfor
 											@endif 
 										</tr>

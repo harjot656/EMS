@@ -369,6 +369,13 @@
 											</select>
 										</div>
 									</div>
+
+									<div class="col-sm-6" id="password_div">
+										<div class="form-group">
+											<label class="control-label">Password</label>
+											<input class="form-control" type="password" name="password" id="password">
+										</div>
+									</div>
 								</div>
 								<input type="hidden" id="last_numeric_employee_id" name="last_numeric_employee_id" value="{{@$last_numeric_employee_id}}">
 								<input type="hidden" id="last_employee_id" name="last_employee_id" value="{{@$last_employee_id}}">
@@ -498,6 +505,17 @@
 		@endsection
 @section('local_script')
 	<script type="text/javascript">
+		$("select[name='designation']").on('change',function(){
+			var val = $(this).val();
+			if(val=='Manager'){
+				$("#password_div").show();
+				$("#password").attr('disabled',false).val("").addClass("form-control").show();
+			}else{
+				$("#password").attr('disabled',true).val("").removeClass("form-control").hide();
+				$("#password_div").hide();
+			}
+		});
+
 		$("input:text.add-name").on('change',function(){
 			var attr = $(this).attr('name');
 			if(attr =='first_name'){
