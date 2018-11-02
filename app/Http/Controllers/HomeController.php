@@ -18,6 +18,9 @@ use Response;
 use Carbon\Carbon;
 use DateTime;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Session;
+
+
 
 class HomeController extends Controller
 {
@@ -159,14 +162,15 @@ class HomeController extends Controller
                 $all_employee_list[][$value['first_name'].' '.$value['last_name']]['attendance'] = $snapshot3;
                 // $all_employee_list[][$value['employee_id']]['attendance'] =   
             }
-           // echo "<pre>";print_r($all_employee_list); die;        
-			foreach($all_employee_list as $key=>$value){
+            foreach($all_employee_list as $key=>$value){
+                  
                 foreach($value as $keyy=>$valuee){
 
                         foreach ($date_arr as $keyyy => $valueee){
-                        
+                         
                             if((isset($valuee)&& !empty($valuee['attendance']))){
                                 if( array_key_exists($valueee, $valuee['attendance'])){
+
                                         $present = $present + 1;
                                         $attendance_arr[$keyy]['attendance'][$i]['date'] = $valueee;
                                         $attendance_arr[$keyy]['attendance'][$i]['in_time'] = $valuee['attendance'][$valueee]['in-time'];
@@ -183,23 +187,27 @@ class HomeController extends Controller
                                         $attendance_arr[$keyy]['attendance'][$i]['comments'] = '-';
                                     }
                                 }else{
-                                        $attendance_arr[$keyy]['attendance'][$i]['date'] = $valueee;
-                                        $attendance_arr[$keyy]['attendance'][$i]['in_time'] = '-';
-                                        $attendance_arr[$keyy]['attendance'][$i]['out_time'] = '-';
-                                        $attendance_arr[$keyy]['attendance'][$i]['status'] = '-';
-                                        $attendance_arr[$keyy]['attendance'][$i]['shift_hours'] = '-';
-                                        $attendance_arr[$keyy]['attendance'][$i]['comments'] = '-';
+
+                                        // $attendance_arr[$keyy]['attendance'][$i]['date'] = $valueee;
+                                        // $attendance_arr[$keyy]['attendance'][$i]['in_time'] = '-';
+                                        // $attendance_arr[$keyy]['attendance'][$i]['out_time'] = '-';
+                                        // $attendance_arr[$keyy]['attendance'][$i]['status'] = '-';
+                                        // $attendance_arr[$keyy]['attendance'][$i]['shift_hours'] = '-';
+                                        // $attendance_arr[$keyy]['attendance'][$i]['comments'] = '-';
                                 }
                             
                             $i++;
+
                         }
                         
                 }
 				
 				$i=0;
+                
 			}
-			// echo "<pre>";print_r($attendance_arr);die;
-            return view('report_view',['data'=>$attendance_arr]);
+            
+             $yearly_average = '';$monthly_average = '';
+            return view('report_view',['data'=>$attendance_arr,'monthly_average'=>$monthly_average,'yearly_average'=>$yearly_average]);
           
         }
         else if(isset($data['report_byy']) && $data['report_byy']!='')
@@ -270,14 +278,9 @@ class HomeController extends Controller
         // echo "<pre>";print_r($request->all());die;
     }
     public function saveEmployee(Request $request){
-            
-         $database  = new FirebaseDb;
-        
-        // die;
+        $database  = new FirebaseDb;
         $reference = $database->get_database()->getReference('employee');
         $reference2 = $database->get_database()->getReference('admin');
-        // echo "<pre>";print_r($reference2->getValue());
-
         if(strtolower(trim($request->designation)) == 'manager'){
             $postData2 = [
                 'username'=>$request->employee_id,
@@ -285,7 +288,6 @@ class HomeController extends Controller
             ];
             $reference2->push($postData2);
         }
-
         $postData  =   [
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
@@ -298,16 +300,12 @@ class HomeController extends Controller
             'designation' => $request->designation,
             'last_numeric_employee_id' =>$request->last_numeric_employee_id
         ];
-        
         $reference->push($postData);
-        
-                 return redirect('index');
+        return redirect('index');
     }
 
     public function editEmployee(Request $request){
         $database  = new FirebaseDb;
-        // echo "<pre>";print_r($request->all());
-        // die;
         $reference = $database->get_database()->getReference('employee/'.$request->node.'')->set([
                        'first_name' => $request->first_name,
                        'last_name'=>$request->last_name,
@@ -323,28 +321,31 @@ class HomeController extends Controller
         }else{
             return redirect()->back()->with('error','Error while editing');
         }
-        // $reference = $database->get_database()->getReference('employee/'.$request->node.'');
-
     }
 
     public function removeEmployee(Request $request){
         $database  = new FirebaseDb;
+        if($request->designation =='Manager'){
+            $reference2 = $database->get_database()->getReference('admin')->getValue();
+            
+            foreach($reference2 as $key=>$value){
+                if($value['username'] ==$request->employee_id){
+                    $reference = $database->get_database()->getReference('admin/'.$key.'')->remove();
+                }
+            }
+        }
         $reference = $database->get_database()->getReference('employee/'.$request->param1.'')->remove();
         if($reference){
             return "1";
         }
     }
-    public function performLogin(Request $request){
-        
+    public function performLogin(Request $request){      
         $database  = new FirebaseDb;
-        
         $request->validate([
             'username'=>'required',
             'password'=>'required'
         ]);
-        
         $reference = $database->get_database()->getReference('admin');
-        
         $snapshot = $reference->getSnapshot();
         $value = $snapshot->getValue();
         $incorrect = 0;
@@ -355,6 +356,7 @@ class HomeController extends Controller
                 $incorrect = $incorrect + 1;
                 if($request->password == $val['password'])
                 {
+                    Session::put('user',$val);
                     return redirect('index');
                 }
                 else
@@ -362,162 +364,22 @@ class HomeController extends Controller
                    return redirect()->back()->withErrors(['errors'=>'Password is incorrect.']);
                 } 
             }
-        }
-        
-        if($incorrect ==0)
-        {
+        }   
+        if($incorrect ==0){
                return redirect()->back()->withErrors(['errors'=>'Username does not exist.']);
         }
         
     }
 
-    public function addAttendance(Request $request){
-        
-        $database  = new FirebaseDb;
-        
-        $reference = $database->get_database()->getReference('employee');
-        
-        $snapshot = $reference->getSnapshot();
-        $value = $snapshot->getValue();
-
-        $reference2 = $database->get_database()->getReference('employee_attendance');
-        $snapshot2 = $reference2->getSnapshot();
-        $employee_attendance = $snapshot2->getValue();
-
-        $list=array();
-        $month = date('m');
-        $year = date('Y');
-
-        for($d=0; $d<31; $d++)
-        {
-            $time=mktime(12, 0, 0, $month, $d, $year);          
-            if (date('m', $time)==$month)       
-                $data['list_date'][]=date('d-m-Y', $time);
-                $data['attendance'][]=0;
-               
-        }
-
-
-        $data['number_days'] = date('t');
-        $data['value'] = $value;
-        $data['employee_attendance'] = $employee_attendance;
-        foreach ($data['value'] as $key => $value) {
-           foreach ($data['employee_attendance'] as $keyy => $valuee) {
-               if($value['employee_id'] == $keyy){
-                $data['value'][$key]['attendance'] = $valuee;
-               }
-           }
-        }
-        // echo "<pre>";print_r($data['value']);
-        // die;
-        $date = date('d-m-Y');
-    	// $date = '2018-10-12';
-		// parse about any English textual datetime description into a Unix timestamp 
-		$ts = strtotime($date);
-		// calculate the number of days since Monday
-		$dow = date('w', $ts);
-		$offset = $dow - 1;
-		if ($offset < 0) {
-		    $offset = 6;
-		}
-		// calculate timestamp for the Monday
-		$ts = $ts - $offset*86400;
-		// loop from Monday till Sunday 
-		for ($i = 0; $i < 7; $i++, $ts += 86400){
-		    $data['date'][] =  date("d-m-Y", $ts);
-		}
-		// echo "<pre>";print_r($data['date']);
-		// die;
-        return view('add_attendance')->with('data',$data);
-    }
-
-    public function addAttendance2(Request $request){
-        
-        $database  = new FirebaseDb;
-        
-        $reference = $database->get_database()->getReference('users');
-        
-        $snapshot = $reference->getSnapshot();
-        $value = $snapshot->getValue();
-
-        $reference2 = $database->get_database()->getReference('employee_attendance');
-        $snapshot2 = $reference2->getSnapshot();
-        $employee_attendance = $snapshot2->getValue();
-
-        $list=array();
-        if($request->date!=''){
-            $month = date('m',strtotime($request->date));
-            $year = date('Y',strtotime($request->date));    
-        }else{
-            $month = date('m');
-            $year = date('Y');
-        }
-        
-
-        for($d=0; $d<31; $d++)
-        {
-            $time=mktime(12, 0, 0, $month, $d, $year);          
-            if (date('m', $time)==$month)       
-                $data['list_date'][]=date('d-m-Y', $time);
-                $data['attendance'][]=0;
-               
-        }
-
-
-        $data['number_days'] = date('t');
-        $data['value'] = $value;
-        $data['employee_attendance'] = $employee_attendance;
-        foreach ($data['value'] as $key => $value) {
-           foreach ($data['employee_attendance'] as $keyy => $valuee) {
-               if($value['employee_id'] == $keyy){
-                $data['value'][$key]['attendance'] = $valuee;
-               }
-           }
-        }
-        // echo "<pre>";print_r($data['value']);
-        // die;
-        $date = date('d-m-Y');
-        // $date = '2018-10-12';
-        // parse about any English textual datetime description into a Unix timestamp 
-        $ts = strtotime($date);
-        // calculate the number of days since Monday
-        $dow = date('w', $ts);
-        $offset = $dow - 1;
-        if ($offset < 0) {
-            $offset = 6;
-        }
-        // calculate timestamp for the Monday
-        $ts = $ts - $offset*86400;
-        // loop from Monday till Sunday 
-        for ($i = 0; $i < 7; $i++, $ts += 86400){
-            $data['date'][$i]['date'] =  date("d-m-Y", $ts);
-            $data['date'][$i]['name'] =  date("l", $ts);
-        }
-        $sunday = Carbon::now()->endOfWeek();
-        $last_date = date('d-m-Y',strtotime($sunday));
-        $prev_week_sunday = date('d-m-Y',strtotime("last sunday,".$last_date.""));
-        $prev_week_monday = date('d-m-Y',strtotime("last Monday,".$prev_week_sunday.""));
-
-        $data['last_date'] = $last_date;
-        $data['prev_week_sunday'] = $prev_week_sunday;
-        $data['prev_week_monday'] = $prev_week_monday;
-        // echo "<pre>";print_r($data);
-        // die;
-        return view('add_attanance2')->with('data',$data);
-    }
-
-
     public function saveAttendance(Request $request){
     		$database  = new FirebaseDb;
-
     	    $data = $request->all();  
             if(($data['status'] == 'absent') || ($data['status'] == 'sick') ||($data['status'] == 'vacation')){
                  $validator = Validator::make($data, [
                             'date' => 'required',
                             // 'comments' =>'required'
                         ]);
-            if ($validator->fails())
-                {
+            if ($validator->fails()){
                     return Response::json(array(
                         'success' => false,
                         'errors' => $validator->getMessageBag()->toArray()
@@ -538,17 +400,15 @@ class HomeController extends Controller
                         return '1';
                     }
                 }     
-
             }else{
                 $validator = Validator::make($data, [
                             'date' => 'required',
                             'in_time' => 'required',
                             'out_time' => 'required',
-                            'comments' =>'required',
+                          //  'comments' =>'required',
                             'total_time'=>'required',
                         ]);
-                if ($validator->fails())
-                {
+                if ($validator->fails()){
                     return Response::json(array(
                         'success' => false,
                         'errors' => $validator->getMessageBag()->toArray()
@@ -557,15 +417,14 @@ class HomeController extends Controller
                     //return response()->json(['errors'=>$validator->errors()->all()]);
                 }
                 else
-                {
-                   
+                {            
                     $in_time = $data['in_time'];
                     $out_time = $data['out_time'];
                     $reference = $database->get_database()->getReference('employee_attendance/'.$data['employee_id'].'/'.$data['date'].'')->set([
                            'name' => 'Attendance',
-                           'in-time'=>date('d-m-Y').' '.$in_time,
-                           'out-time'=>date('d-m-Y').' '.$out_time,
-                           'comments'=>$data['comments'],
+                           'in-time'=>$data['date'].' '.$in_time,
+                           'out-time'=>$data['date'].' '.$out_time,
+                           'comments'=>(isset($data['comments'])&& $data['comments']!='')?$data['comments']:'',
                            'shift_hours'=>$data['total_time'],
                            'status'=>$data['status']
                           ]);
@@ -574,24 +433,12 @@ class HomeController extends Controller
                     }
                 }
             }     
-		    // $myValue=  array();
-		    // parse_str($data['param1'], $myValue);
-		 
-		    // $myValue['attendance_date'] = str_replace('/', '-', $myValue['attendance_date']);
-		    
-
-		   
     }
 
     public function getTime(Request $request){
-        // echo "<pre>";print_r($request->all());
-        //$date = strtotime($request->start);
-        
         $dateDiff = intval((strtotime($request->end)-strtotime($request->start))/60);
-
         $hours = intval($dateDiff/60);
         $minutes = $dateDiff%60;
-       // echo $hours .' '.$minutes;
         $time='';
         if($hours >0 && $minutes>0){
             $time = $hours.' hours '.$minutes.' minutes';
@@ -605,23 +452,16 @@ class HomeController extends Controller
         return $time;
     }
 
-    public function prevNextWeek(Request $request){
-      
+    public function prevNextWeek(Request $request){     
         $end = $request->last_date;
-        
         $earlier = new DateTime($end);
-
-
-
         if($request->week =='next_week'){
             $prev_week_sunday = date('d-m-Y',strtotime("last sunday,".$end.""));
             $prev_week_monday = date('d-m-Y',strtotime("last Monday,".$prev_week_sunday.""));
-
             $next_week_date = date('d-m-Y',strtotime("next sunday,".$end.""));
             $later = new DateTime($next_week_date);
             $diff = $later->diff($earlier)->format("%a");
-
-             $date = $next_week_date;
+            $date = $next_week_date;
             // $date = '2018-10-12';
             // parse about any English textual datetime description into a Unix timestamp 
             $ts = strtotime($date);
@@ -780,4 +620,11 @@ class HomeController extends Controller
         }
         
     }
+
+    public function logout(Request $request){
+        $request->session()->forget('user');
+        $request->session()->flush();
+        return redirect()->back();
+    }
+
 }

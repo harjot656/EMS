@@ -38,6 +38,9 @@ width: 100%;
 padding: 12px;
 border-radius: 0;
 }
+.day_name th span{
+font-size: 12px;
+}
 </style>
     <link href="http://www.jqueryscript.net/css/jquerysctipttop.css" rel="stylesheet" type="text/css">
 <link href="{{asset('css/timedropper.css')}}" rel="stylesheet" type="text/css">
@@ -55,107 +58,97 @@ border-radius: 0;
 							<!-- <a href="#" class="btn btn-primary rounded pull-right" data-toggle="modal" data-target="#add_leave"><i class="fa fa-plus"></i> Add Attendance</a> -->
 						</div>
 					</div>
-					<div class="row filter-row">
-						<!-- <div class="col-sm-3 col-xs-6">  
-							<div class="form-group form-focus">
-								<label class="control-label">Employee ID</label>
-								<input type="text" class="form-control floating" />
+					<form id="search_attendance" name="search_attendance" method="post" action="{{route('add-attendance3')}}">
+						@csrf
+						<div class="row filter-row">
+							<!-- <div class="col-sm-3 col-xs-6">  
+								<div class="form-group form-focus">
+									<label class="control-label">Employee ID</label>
+									<input type="text" class="form-control floating" />
+								</div>
+							</div> -->
+							<div class="col-sm-3 col-xs-6"> 
+								<div class="form-group form-focus select-focus">
+									<label class="control-label" name="month">Select Month</label>
+									<select class="select floating" name="select_month"> 
+										<option>-Select Month-</option>
+										@for ($m=1; $m<=12; $m++)
+										<?php if($m ==$data['currently_selected_month']) $selected ='selected';else $selected =''; ?>
+
+										<option value="{{$m}}" <?php echo $selected; ?>>{{date('F', mktime(0,0,0,$m, 1, date('Y')))}}</option>
+									    @endfor
+									</select>
+								</div>
 							</div>
-						</div> -->
-						<div class="col-sm-3 col-xs-6"> 
-							<div class="form-group form-focus select-focus">
-								<label class="control-label" name="month">Select Month</label>
-								<select class="select floating"> 
-									<option>-Select Month-</option>
-									@for ($m=1; $m<=12; $m++)
-									<?php if(date('F') == date('F', mktime(0,0,0,$m, 1, date('Y')))) $selected ='selected';else $selected =''; ?>
-									<option <?php echo $selected; ?>>{{date('F', mktime(0,0,0,$m, 1, date('Y')))}}</option>
-								    @endfor
-								</select>
+
+							<div class="col-sm-3 col-xs-6"> 
+								<div class="form-group form-focus select-focus">
+									<label class="control-label">Select Year</label>
+									<select id="specify-year" name="year" class="select floating"> 
+										@foreach(range( $data['latest_year'], $data['earliest_year'] ) as $key)
+										<?php if($key ==$data['currently_selected']) $selected="selected";else $selected = ''; ?>
+										<option {{$selected}} value="{{$key}}">{{$key}}</option>
+										@endforeach
+									</select>
+								</div>
 							</div>
-						</div>
-						<div class="col-sm-3 col-xs-6"> 
-							<div class="form-group form-focus select-focus">
-								<label class="control-label">Select Year</label>
-								<select class="select floating"> 
-									<option>-</option>
-									<option>2017</option>
-									<option>2016</option>
-									<option>2015</option>
-									<option>2014</option>
-									<option>2013</option>
-								</select>
-							</div>
-						</div>
-						<div class="col-sm-3 col-xs-6">  
-							<a href="#" class="btn btn-success btn-block"> Search </a>  
-						</div>     
-                    </div>
+							<div class="col-sm-3 col-xs-6">  
+								<button class="btn btn-success btn-block"> Search </button>  
+							</div>     
+	                    </div>
+                    </form>
                     <div class="row">
                         <div class="col-lg-12">
 							<div class="table-responsive">
-								<table class="table table-striped custom-table m-b-0">
+								<table class="table table-striped custom-table m-b-0 day_name">
 									<thead>
 										<tr>
 											<th>Employee</th>
-											@for($i=1;$i<=$data['number_days'];$i++)
-											<th>{{$i}}</th>
-											@endfor
+											@foreach($data['day'] as $key=>$value)
+											<th>{{$value['day_number']}} <br> <span>{{$value['day_name']}}</span></th>
+											@endforeach
 											
 										</tr>
 									</thead>
 									<tbody>
-										<?php $arr= array(); ?>
 										@foreach($data['value'] as $key=>$value)
 										<tr>	
 											<?php //echo "<pre>"; echo count($data['list_date']); print_r($data['list_date']);die?>
 											<!-- <input type="hidden" name="last_date" id="last_date" value="{{@$data['last_date']}}">
 											<input type="hidden" name="prev_week_sunday" id="prev_week_sunday" value="{{@$data['prev_week_sunday']}}">
 											<input type="hidden" name="prev_week_monday" id="prev_week_monday" value="{{@$data['prev_week_monday']}}"> -->
-											<td><a href="#" onclick="open_attendance_modal(this.text,'{{$value['employee_id']}}',<?php echo "'$key'"; ?>,'{{@$data['last_date']}}','{{@$data['prev_week_sunday']}}','{{@$data['prev_week_monday']}}') "data-toggle="modal" data-target="#add_attendence">{{$value['first_name']}} {{''}} {{$value['last_name']}}</a></td>
-
-											@if(isset($value['attendance']))								
-												@foreach($value['attendance'] as $keyy=>$valuee)
-													<?php 
-													
-														$a = (int)date('d',strtotime($keyy)) - 1;
-														$data['attendance'][$a]	= 1;
-														$data['attendance_employee'][$a] = $valuee;
-													 ?>
-													 
-												@endforeach
+											<?php $name = ucwords($value['first_name'].' '.$value['last_name']); ?>
+											<td><a href="#" onclick="open_attendance_modal(this.text,'{{$value['employee_id']}}',<?php echo "'$key'"; ?>,'{{@$data['last_date']}}','{{@$data['prev_week_sunday']}}','{{@$data['prev_week_monday']}}') "data-toggle="modal" data-target="#add_attendence">{{$name}}</a></td>
+											
+											@if(isset($value['attendance']))																
 												@for($j=0;$j<(count($data['list_date']));$j++)
-												<?php //echo "<pre>";print_r($data['attendance_employee']);die; ?>
+												    @if(strtotime($data['list_date'][$j])<= strtotime(date('d-m-Y')))
+														@if(array_key_exists($data['list_date'][$j],$value['attendance']))
 
-													@if($data['attendance'][$j] == 1)	
-													<?php $status = ucwords($data['attendance_employee'][$j]['status']);
-														if($status =='Present'){
-														$sign = "<i class='fa fa-check text-success'></i>";	
-														}else{
-															$sign = "<i class='fa fa-close text-danger'></i>";
-														}
-													?>
-														<td title="{{$status}}{{$data['attendance_employee'][$j]['in-time']}}" ><?= $sign ?></td>
-														<?php $data['attendance'][$j] = 0; $data['attendance_employee'][$j] = array();?>
-												 	@else
-													 	@if(strtotime($data['list_date'][$j])<= strtotime(date('d-m-Y')))
-															<td title="#"><i class='fa fa-close text-danger'></i></td>
+																<?php $status =ucwords($value['attendance'][$data['list_date'][$j]]['status']);  ?>
+																@if($status =='Present' ||$status =='Weekend')
+																	<?php $sign = "<i class='fa fa-check text-success'></i>"; ?>
+																@else
+																	<?php $sign = "<i class='fa fa-close text-danger'></i>"; ?>
+																@endif
+																<td title="{{ucwords($status) }}{{' '}}{{ $value['attendance'][$data['list_date'][$j]]['in-time']}}" ><?= $sign ?></td>
 														@else
-															<td title="#">N/A</td>
+														<td title="#"><i class='fa fa-close text-danger'></i></td>
 														@endif
-													@endif
+													@else
+													    <td title="#"></td>
+													@endif	
 												@endfor
 											@else
 												@for($j=0;$j<(count($data['list_date']));$j++)
 													@if(strtotime($data['list_date'][$j])<= strtotime(date('d-m-Y')))
 														<td title="#"><i class='fa fa-close text-danger'></i></td>
 													@else
-														<td title="#">N/A</td>
+														<td title="#"></td>
 													@endif	 
 												@endfor
 											@endif 
 										</tr>
-										<?php $arr =array();?>
 										@endforeach
 									</tbody>
 								</table>

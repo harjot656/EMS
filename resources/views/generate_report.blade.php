@@ -20,6 +20,13 @@
 .select2-container--open .select2-dropdown {
     top: -30px;
 }
+
+.custom_div_error{
+    min-width: 100%;
+    position: absolute;
+    top: 50px;
+    left: 0;
+}
  </style>
 
  	
@@ -71,7 +78,7 @@
 							</div>
 							</div>
 							
-						   <div class="col-sm-3 col-md-2 col-xs-6"> 
+						   <div class="col-sm-3 col-md-2 col-xs-6" > 
 								<input type="radio" id="specify-w" data-for="specify-week" name="report-by"> <label for="specify-w">Weekly</label>
 								<div class="form-group form-focus">
 									<label class="control-label">Select Week</label>
@@ -183,9 +190,26 @@
 		}
 	});
 
-	// $("#gen_rpt").on('click',function(e){
+	$("#gen_rpt").on('click',function(e){
 	// 	console.log($("#generate_report").valid());
-	// 	if($("#generate_report").valid()){
+		if($("#generate_report").valid()){
+			var value = $("#specify-week").val();
+			var arr = value.split(' ');
+	
+			arr[0] = arr[0].split('-').reverse().join('-');
+			arr[2] = arr[2].split('-').reverse().join('-');
+			console.log(arr[0]+" "+arr[2]);
+			var date2 = new Date(arr[2]);
+			var date1 = new Date(arr[0]);
+			var timeDiff = Math.abs(date2.getTime() - date1.getTime());
+			var day_difference = Math.ceil(timeDiff / (1000 * 3600 * 24));
+			if(day_difference!=7){
+				$("#specify-week").after("<div class='alert alert-danger custom_div_error'>Please select range with 7 days</div>");
+			e.preventDefault();
+			}else{
+				$('.custom_div_error').remove();
+				
+			}
 	// 		e.preventDefault();
 	// 		$.ajax({
 	// 			headers: {
@@ -208,19 +232,24 @@
 	// 			console.log("complete");
 	// 		});
 			
-	// 	}
-
-		
-		
-	// });
+		}	
+	});
 	$("#specify-week").daterangepicker({
+		autoUpdateInput: false,
 		locale: {
+			cancelLabel: 'Clear',
       format: 'DD-MM-YYYY',
     },
-    maxDate:new Date()
+    maxDate:new Date(),
+    onSelect:function(){
+    	endDate: '+7d'
+    }
 	});
-
+$('#specify-week').on('apply.daterangepicker', function(ev, picker) {
+	// console.log(ev+" "+;
 	
+      $(this).val(picker.startDate.format('DD-MM-YYYY') + ' - ' + picker.endDate.format('DD-MM-YYYY'));
+  });
 	
 </script>
 @endsection

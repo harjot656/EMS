@@ -16,6 +16,7 @@
     </head>
     <body>
         <div class="main-wrapper">
+        	@if(Route::currentRouteName()!='get_report')
             <div class="header">
                 <div class="header-left">
                     <a href="index.php" class="logo">
@@ -37,21 +38,20 @@
 							<i class="caret"></i>
 						</a>
 						<ul class="dropdown-menu">
-							<li><a href="profile.php">My Profile</a></li>
-							<li><a href="edit-profile.php">Edit Profile</a></li>
-							<li><a href="login.php">Logout</a></li>
+							<li><a href="{{route('logout')}}">Logout</a></li>
 						</ul>
 					</li>
+
 				</ul>
 				<div class="dropdown mobile-user-menu pull-right">
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-ellipsis-v"></i></a>
 					<ul class="dropdown-menu pull-right">
-						<li><a href="profile.php">My Profile</a></li>
-						<li><a href="edit-profile.php">Edit Profile</a></li>
-						<li><a href="login.php">Logout</a></li>
+						<li><a href="{{route('logout')}}">Logout</a></li>
 					</ul>
 				</div>
             </div>
+            @endif
+            @if(Route::currentRouteName()!='get_report')
             <div class="sidebar" id="sidebar">
                 <div class="sidebar-inner slimscroll">
 					<div id="sidebar-menu" class="sidebar-menu">
@@ -73,3 +73,4 @@
 					</div>
                 </div>
             </div>
+            @endif 
