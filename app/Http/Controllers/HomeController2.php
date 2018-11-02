@@ -105,6 +105,8 @@ class HomeController2 extends Controller
         $snapshot = $reference->getSnapshot();
         $value = $snapshot->getValue();
         
+        echo "<pre>";print_r($value);die;
+
         foreach($value as $key => $val)
         {
             $user = $val['username'];
@@ -129,65 +131,7 @@ class HomeController2 extends Controller
         
     }
 
-    public function addAttendance(Request $request){
-        
-        $database  = new FirebaseDb;
-        
-        $reference = $database->get_database()->getReference('employee');
-        
-        $snapshot = $reference->getSnapshot();
-        $value = $snapshot->getValue();
 
-        $reference2 = $database->get_database()->getReference('employee_attendance');
-        $snapshot2 = $reference2->getSnapshot();
-        $employee_attendance = $snapshot2->getValue();
-
-        $list=array();
-        $month = date('m');
-        $year = date('Y');
-
-        for($d=0; $d<31; $d++)
-        {
-            $time=mktime(12, 0, 0, $month, $d, $year);          
-            if (date('m', $time)==$month)       
-                $data['list_date'][]=date('d-m-Y', $time);
-                $data['attendance'][]=0;
-               
-        }
-
-
-        $data['number_days'] = date('t');
-        $data['value'] = $value;
-        $data['employee_attendance'] = $employee_attendance;
-        foreach ($data['value'] as $key => $value) {
-           foreach ($data['employee_attendance'] as $keyy => $valuee) {
-               if($value['employee_id'] == $keyy){
-                $data['value'][$key]['attendance'] = $valuee;
-               }
-           }
-        }
-        // echo "<pre>";print_r($data['value']);
-        // die;
-        $date = date('d-m-Y');
-    	// $date = '2018-10-12';
-		// parse about any English textual datetime description into a Unix timestamp 
-		$ts = strtotime($date);
-		// calculate the number of days since Monday
-		$dow = date('w', $ts);
-		$offset = $dow - 1;
-		if ($offset < 0) {
-		    $offset = 6;
-		}
-		// calculate timestamp for the Monday
-		$ts = $ts - $offset*86400;
-		// loop from Monday till Sunday 
-		for ($i = 0; $i < 7; $i++, $ts += 86400){
-		    $data['date'][] =  date("d-m-Y", $ts);
-		}
-		// echo "<pre>";print_r($data['date']);
-		// die;
-        return view('add_attendance')->with('data',$data);
-    }
 
     public function addAttendance3(Request $request){
         
@@ -203,31 +147,57 @@ class HomeController2 extends Controller
         $employee_attendance = $snapshot2->getValue();
 
         $list=array();
-        if($request->date!=''){
-            $month = date('m',strtotime($request->date));
-            $year = date('Y',strtotime($request->date));    
+        if ($request->isMethod('post')) {
+            // echo "<pre>";print_r($request->all());
+           $month = $request->select_month<10?'0'.$request->select_month:$request->select_month;
+           $year = $request->year;       
+           $days = cal_days_in_month(CAL_GREGORIAN,$request->select_month,$request->year);
+           for($i=1;$i<=$days;$i++){
+              $day[$i]['day_number'] = $i;
+              $day[$i]['day_name'] = date('D',strtotime($i.'-'.$month.'-'.$year));  
+            }
+           $actual_date = date('d').'-'.$month.'-'.$year;
+           $date = $actual_date;
+           $data['currently_selected_month'] = $month;
+           $data['currently_selected'] = $year;
+           $carbon_date = new Carbon($date);
+           $last_date =  $carbon_date->endOfWeek()->format('d-m-Y');
+           $prev_week_sunday = date('d-m-Y',strtotime("last sunday,".$last_date.""));
+           $prev_week_monday = date('d-m-Y',strtotime("last Monday,".$prev_week_sunday.""));
         }else{
             $month = date('m');
             $year = date('Y');
+            $days = cal_days_in_month(CAL_GREGORIAN,$month,$year);
+            for($i=1;$i<=$days;$i++){
+              $day[$i]['day_number'] = $i;
+              $day[$i]['day_name'] = date('D',strtotime($i.'-'.$month.'-'.$year));  
+            }
+            $date = date('d-m-Y');
+            $data['currently_selected_month'] = date('m');
+            $data['currently_selected'] = date('Y');
+
+            $sunday = Carbon::now()->endOfWeek();
+            $last_date = date('d-m-Y',strtotime($sunday));
+            $prev_week_sunday = date('d-m-Y',strtotime("last sunday,".$last_date.""));
+            $prev_week_monday = date('d-m-Y',strtotime("last Monday,".$prev_week_sunday.""));
         }
         
-
-        for($d=0; $d<31; $d++)
+        // echo date('t');die;
+        for($d=0; $d<=$days; $d++)
         {
             $time=mktime(12, 0, 0, $month, $d, $year);          
-            if (date('m', $time)==$month)       
+            if (date('m', $time)==$month){
                 $data['list_date'][]=date('d-m-Y', $time);
                 $data['attendance'][]=0;
                 $data['attendance_employee'][]=array();
+            }       
+                
                
         }
-
-        // for($i=0;$i<count($data['list_date']);$i++){
-
-        // }
-        // echo "<pre>";print_r($data);die;
-
-        $data['number_days'] = date('t');
+      
+        $data['number_days'] = $days;
+       $data['day'] = $day;
+       // echo "<pre>";print_r($data);die;
         $data['value'] = $value;
         $data['employee_attendance'] = $employee_attendance;
         foreach ($data['value'] as $key => $value) {
@@ -239,10 +209,9 @@ class HomeController2 extends Controller
            }
         }
         // echo "<pre>";
-        
-        // print_r($data['value']);
+        // print_r($data);
         // die;
-        $date = date('d-m-Y');
+       
         // $date = '2018-10-12';
         // parse about any English textual datetime description into a Unix timestamp 
         $ts = strtotime($date);
@@ -259,15 +228,16 @@ class HomeController2 extends Controller
             $data['date'][$i]['date'] =  date("d-m-Y", $ts);
             $data['date'][$i]['name'] =  date("l", $ts);
         }
-        $sunday = Carbon::now()->endOfWeek();
-        $last_date = date('d-m-Y',strtotime($sunday));
-        $prev_week_sunday = date('d-m-Y',strtotime("last sunday,".$last_date.""));
-        $prev_week_monday = date('d-m-Y',strtotime("last Monday,".$prev_week_sunday.""));
+        
 
         $data['last_date'] = $last_date;
         $data['prev_week_sunday'] = $prev_week_sunday;
         $data['prev_week_monday'] = $prev_week_monday;
-        // echo "<pre>";print_r($data['date']);
+        
+        
+        $data['earliest_year'] = 1950;
+        $data['latest_year'] = date('Y'); 
+        // echo "<pre>";print_r($data);
         // die;
         return view('add_attandance3')->with('data',$data);
     }

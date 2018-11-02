@@ -45,13 +45,14 @@
 										</tr>
 									</thead>
 									<tbody>
+
 										@if(!empty($data))
 										@foreach($data as $key=>$value)
-
+										
 										<tr>
 											<td>
-												<a href="profile.php" class="avatar">J</a>
-												<h2><a href="#">{{$value['first_name'].' '.$value['last_name']}} <span>{{$value['designation']}}</span></a></h2>
+												<a href="javascript:void(0);" class="avatar remove_hover"><?php echo strtoupper(substr($value['first_name'],0,1)); ?></a>
+												<h2><a href="#" class="remove_hover">{{ucwords($value['first_name'].' '.$value['last_name'])}} <span>{{$value['designation']}}</span></a></h2>
 											</td>
 											<td>{{$value['employee_id']}}</td>
 											<td>{{$value['email']}}</td>
@@ -61,7 +62,10 @@
 												<div class="dropdown">
 													
 													<a href="#" class="action-icon" data-toggle="modal" title="Edit" data-target="#edit_employee" onclick="edit_employeee('{{$value['employee_id']}}','{{$value['designation']}}','{{$value['first_name']}}','{{$value['last_name']}}','{{$value['email']}}',{{$value['phone']}},'{{$value['joining_date']}}','{{$key}}');"><i class="fa fa-pencil m-r-5"></i> </a>
-													<a href="Javascript:void(0);" class="action-icon" data-toggle="modal" title="Delete"  onclick="if(confirm('Are you sure you want to remove this user?')){event.stopPropagation(); event.preventDefault(); remove_user('{{$key}}');}else{event.stopPropagation(); event.preventDefault();}"><i class="fa fa-trash-o m-r-5"></i> </a>
+													<?php //echo "<pre>"; print_r($value);die; ?>
+													<?php if($value['designation']=='Manager' ){$valuee = $value['employee_id'];}else{$valuee = $key;} ?>
+													
+													<a href="Javascript:void(0);" class="action-icon" data-toggle="modal" title="Delete"  onclick="if(confirm('Are you sure you want to remove this user?')){event.stopPropagation(); event.preventDefault(); remove_user('{{$key}}','{{$value["employee_id"]}}','{{$value["designation"]}}');}else{event.stopPropagation(); event.preventDefault();}"><i class="fa fa-trash-o m-r-5"></i> </a>
 													
 												</div>
 											</td>
@@ -369,6 +373,13 @@
 											</select>
 										</div>
 									</div>
+
+									<div class="col-sm-6" id="password_div">
+										<div class="form-group">
+											<label class="control-label">Password</label>
+											<input class="form-control" type="password" name="password" id="password">
+										</div>
+									</div>
 								</div>
 								<input type="hidden" id="last_numeric_employee_id" name="last_numeric_employee_id" value="{{@$last_numeric_employee_id}}">
 								<input type="hidden" id="last_employee_id" name="last_employee_id" value="{{@$last_employee_id}}">
@@ -498,6 +509,17 @@
 		@endsection
 @section('local_script')
 	<script type="text/javascript">
+		$("select[name='designation']").on('change',function(){
+			var val = $(this).val();
+			if(val=='Manager'){
+				$("#password_div").show();
+				$("#password").attr('disabled',false).val("").addClass("form-control").show();
+			}else{
+				$("#password").attr('disabled',true).val("").removeClass("form-control").hide();
+				$("#password_div").hide();
+			}
+		});
+
 		$("input:text.add-name").on('change',function(){
 			var attr = $(this).attr('name');
 			if(attr =='first_name'){
@@ -528,14 +550,14 @@
 			$("#joining_date").val(joining_date);
 			$("#node_val").val(node);
 		}
-		function remove_user(node){
+		function remove_user(node,employee_id,designation){
 			$.ajax({
 				 headers: {
 			        'X-CSRF-TOKEN': $('input[name="_token"]').val()
 			    },
 				url: '{{route("removeEmployee")}}',
 				type: 'POST',
-				data: {param1: node},
+				data: {param1: node,'employee_id':employee_id,designation:designation},
 			})
 			.done(function(data) {
 				if(data =='1'){
@@ -547,6 +569,7 @@
 			
 			// console.log(node);
 		}
+		$(".remove_hover").css('cursor', 'default');
 		</script>
 		<!-- <script type="text/javascript" src="{{asset('js/index.js')}}"></script> -->
 @endsection
