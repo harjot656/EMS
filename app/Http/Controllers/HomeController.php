@@ -19,7 +19,7 @@ use Carbon\Carbon;
 use DateTime;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Session;
-
+use Illuminate\Support\Facades\Hash;
 
 
 class HomeController extends Controller
@@ -48,6 +48,7 @@ class HomeController extends Controller
         }else{
            $data['last_employee_id'] = 1000 + (isset($last_employee_id['last_numeric_employee_id'])?$last_employee_id['last_numeric_employee_id']:$last_employee_id['employee_id']); 
         }
+        // echo "<pre>";print_r($value);die;
         return view('index',array('data'=>$value,'last_numeric_employee_id'=>$data['last_employee_id']));
     }
     public function holiday(Request $request){
@@ -144,8 +145,7 @@ class HomeController extends Controller
             return redirect()->back();
         }
         // echo "<pre>";print_r($request->all());die;
-        if($data['report_by'] =='all_employees'){
-        	
+        if($data['report_by'] =='all_employees'){   	
             $database  = new FirebaseDb;
             $reference = $database->get_database()->getReference('employee');
             $snapshot = $reference->getSnapshot();
@@ -159,9 +159,10 @@ class HomeController extends Controller
             foreach($data['employee_list'] as $key=>$value){
                 $reference3 = $database->get_database()->getReference('employee_attendance/'.$value['employee_id'].'');
                 $snapshot3 = $reference3->getSnapshot()->getValue();
-                $all_employee_list[][$value['first_name'].' '.$value['last_name']]['attendance'] = $snapshot3;
+                $all_employee_list[][$value['first_name'].' '.$value['last_name'].'( Employee Id)=>'.$value['employee_id']]['attendance'] = $snapshot3;
                 // $all_employee_list[][$value['employee_id']]['attendance'] =   
             }
+
             foreach($all_employee_list as $key=>$value){
                   
                 foreach($value as $keyy=>$valuee){
@@ -205,10 +206,9 @@ class HomeController extends Controller
 				$i=0;
                 
 			}
-            
              $yearly_average = '';$monthly_average = '';
+             // echo "<pre>";print_r($attendance_arr);die;
             return view('report_view',['data'=>$attendance_arr,'monthly_average'=>$monthly_average,'yearly_average'=>$yearly_average]);
-          
         }
         else if(isset($data['report_byy']) && $data['report_byy']!='')
         {
@@ -224,8 +224,8 @@ class HomeController extends Controller
 					 $data['employee_detail'] = $value;
 				 }
 			 }
-            $name = $data['employee_detail']['first_name'].' '.$data['employee_detail']['last_name'];
-            // echo "<pre>";print_r($data['employee_attendance']);die;
+            $name = $data['employee_detail']['first_name'].' '.$data['employee_detail']['last_name'].' (Employee Id)=>'.$data['employee_detail']['employee_id'];
+            // echo "<pre>";print_r($data['employee_detail']);die;
             $i = 0;
             $present = 0;
             foreach ($date_arr as $key => $value) {
@@ -269,7 +269,7 @@ class HomeController extends Controller
             	}
             	
             }
-           
+           // echo "<pre>";print_r($data['employee_attendance']);die;
 
             return view('report_view',['data'=>$attendance_arr,'yearly_average'=>$yearly_average,'monthly_average'=>$monthly_average]);
               
@@ -284,7 +284,7 @@ class HomeController extends Controller
         if(strtolower(trim($request->designation)) == 'manager'){
             $postData2 = [
                 'username'=>$request->employee_id,
-                'password'=>$request->password
+                'password'=>bcrypt($request->password)
             ];
             $reference2->push($postData2);
         }
@@ -293,7 +293,7 @@ class HomeController extends Controller
             'last_name' => $request->last_name,
             'username' => $request->username,
             'email' => $request->email,
-            'password' => $request->password,
+            'password' => bcrypt($request->password),
             'employee_id' => $request->employee_id,
             'joining_date' => $request->joining_date,
             'phone' => $request->phone,
@@ -358,6 +358,9 @@ class HomeController extends Controller
                 {
                     Session::put('user',$val);
                     return redirect('index');
+                }else if(Hash::check($request->password, $val['password'])){
+                    Session::put('user',$val);
+                    return redirect('index');
                 }
                 else
                 {
@@ -374,7 +377,7 @@ class HomeController extends Controller
     public function saveAttendance(Request $request){
     		$database  = new FirebaseDb;
     	    $data = $request->all();  
-            if(($data['status'] == 'absent') || ($data['status'] == 'sick') ||($data['status'] == 'vacation')){
+            if(($data['status'] == 'absent') || ($data['status'] == 'sick') ||($data['status'] == 'vacation') || ($data['status'] == 'weekend')){
                  $validator = Validator::make($data, [
                             'date' => 'required',
                             // 'comments' =>'required'
@@ -401,6 +404,7 @@ class HomeController extends Controller
                     }
                 }     
             }else{
+
                 $validator = Validator::make($data, [
                             'date' => 'required',
                             'in_time' => 'required',
