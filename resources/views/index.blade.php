@@ -6,6 +6,7 @@
     padding: 10px 5px;
 }
 </style>
+<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
    <div class="page-wrapper">
                 <div class="content container-fluid">
 					<div class="row">
@@ -57,11 +58,16 @@
 											<td>{{$value['employee_id']}}</td>
 											<td>{{$value['email']}}</td>
 											<td>{{$value['phone']}}</td>
+											@if(is_array($value['joining_date']))
+											<td>{{date('d/m/Y',strtotime($value['joining_date']['date']))}} </td>
+											@else
 											<td>{{$value['joining_date']}}</td>
+											@endif
+											<?php if(is_array($value['joining_date'])){ $join_date =date('d/m/Y',strtotime($value['joining_date']['date'])); }else{$join_date = $value['joining_date'];} ?>
 											<td class="text-right">
 												<div class="dropdown">
 													
-													<a href="#" class="action-icon" data-toggle="modal" title="Edit" data-target="#edit_employee" onclick="edit_employeee('{{$value['employee_id']}}','{{$value['designation']}}','{{$value['first_name']}}','{{$value['last_name']}}','{{$value['email']}}',{{$value['phone']}},'{{$value['joining_date']}}','{{$key}}');"><i class="fa fa-pencil m-r-5"></i> </a>
+													<a href="#" class="action-icon" data-toggle="modal" title="Edit" data-target="#edit_employee" onclick="edit_employeee('{{$value['employee_id']}}','{{$value['designation']}}','{{$value['first_name']}}','{{$value['last_name']}}','{{$value['email']}}',{{$value['phone']}},'{{$join_date}}','{{$key}}');"><i class="fa fa-pencil m-r-5"></i> </a>
 													<?php //echo "<pre>"; print_r($value);die; ?>
 													<?php if($value['designation']=='Manager' ){$valuee = $value['employee_id'];}else{$valuee = $key;} ?>
 													
@@ -456,15 +462,6 @@
 											<input class="form-control" type="text" id="phone" name="phone">
 										</div>
 									</div>
-									<!-- <div class="col-sm-6">
-										<div class="form-group">
-											<label class="control-label">Company</label>
-											<select class="select">
-												<option value="">Global Technologies</option>
-												<option value="1">Delta Infotech</option>
-											</select>
-										</div>
-									</div> -->
 									<div class="col-sm-6">
 										<div class="form-group">
 											<label class="control-label">Designation</label>
@@ -508,6 +505,7 @@
 		<input type="hidden" id="last_employee_id" name="last_employee_id" value="{{@$last_employee_id}}">
 		@endsection
 @section('local_script')
+<script type="text/javascript" src="//cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
 	<script type="text/javascript">
 		$("select[name='designation']").on('change',function(){
 			var val = $(this).val();

@@ -126,7 +126,7 @@ font-size: 12px;
 														@if(array_key_exists($data['list_date'][$j],$value['attendance']))
 
 																<?php $status =ucwords($value['attendance'][$data['list_date'][$j]]['status']);  ?>
-																@if($status =='Present' ||$status =='Weekend')
+																@if($status =='Present' )
 																	<?php $sign = "<i class='fa fa-check text-success'></i>"; ?>
 																@else
 																	<?php $sign = "<i class='fa fa-close text-danger'></i>"; ?>

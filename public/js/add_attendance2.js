@@ -21,11 +21,11 @@ $(document).on('change','select.status_presence',function(){
 			$("input[name='total_time#"+arr[1]+"']").attr('disabled',true).val("");
 			$("button[name='submit#"+arr[1]+"']").attr('disabled',false);
 		}else if(value.toLowerCase() =='weekend'){
-			$("input[name='in_time#"+arr[1]+"']").attr('disabled',false).val("");
-			$("input[name='out_time#"+arr[1]+"']").attr('disabled',false).val("");
-			$("input[name='total_time#"+arr[1]+"']").attr('disabled',false).val("");
-			$("input[name='comments#"+arr[1]+"']").attr('disabled',false).val("");
-			$("button[name='submit#"+arr[1]+"']").attr('disabled', false);
+			$("input[name='comments#"+arr[1]+"']").attr('disabled',false).val("");	
+			$("input[name='in_time#"+arr[1]+"']").attr('disabled',true).val("");
+			$("input[name='out_time#"+arr[1]+"']").attr('disabled',true).val("");
+			$("input[name='total_time#"+arr[1]+"']").attr('disabled',true).val("");
+			$("button[name='submit#"+arr[1]+"']").attr('disabled',false);
 		}
 		else{
 			$("input[name='in_time#"+arr[1]+"']").attr('disabled',true).val("");
