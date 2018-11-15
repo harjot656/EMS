@@ -93,6 +93,7 @@ class HomeController extends Controller
 
     public function get_report(Request $request){
     	$data = $request->all();
+        // echo "<pre>";print_r($data);die;
         if(!isset($data['report_by'])){
             return redirect('generate_report');
         }        
@@ -109,6 +110,7 @@ class HomeController extends Controller
             }
         }else if(isset($data['week']) && $data['week']!=''){  //////////  For Range of week 
             $arr = explode(' ',$data['week']);
+           
             if($arr[0]==$arr[2]){
              $date_arr[] = $arr[0];   
             }else{
@@ -159,7 +161,7 @@ class HomeController extends Controller
             foreach($data['employee_list'] as $key=>$value){
                 $reference3 = $database->get_database()->getReference('employee_attendance/'.$value['employee_id'].'');
                 $snapshot3 = $reference3->getSnapshot()->getValue();
-                $all_employee_list[][$value['first_name'].' '.$value['last_name'].'( Employee Id)=>'.$value['employee_id']]['attendance'] = $snapshot3;
+                $all_employee_list[][$value['first_name'].' '.$value['last_name'].'$%#'.$value['employee_id']]['attendance'] = $snapshot3;
                 // $all_employee_list[][$value['employee_id']]['attendance'] =   
             }
 
@@ -224,7 +226,7 @@ class HomeController extends Controller
 					 $data['employee_detail'] = $value;
 				 }
 			 }
-            $name = $data['employee_detail']['first_name'].' '.$data['employee_detail']['last_name'].' (Employee Id)=>'.$data['employee_detail']['employee_id'];
+            $name = $data['employee_detail']['first_name'].' '.$data['employee_detail']['last_name'].'$%#'.$data['employee_detail']['employee_id'];
             // echo "<pre>";print_r($data['employee_detail']);die;
             $i = 0;
             $present = 0;

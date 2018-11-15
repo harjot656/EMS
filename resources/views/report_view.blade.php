@@ -6,14 +6,14 @@
 	
 	<div class='row' id="content">
 		@foreach($data as $key=>$value)
-
+		<?php $employee_id =  explode('$%#',$key);    ?>
 		<div class='col-lg-12'> 
 	
 		</div>
 		<div class='col-lg-12'>
 			<div class='table-responsive'>
 				<table class='table table-striped custom-table m-b-0'>
-					 <caption><h3>Name: {{$key}} &nbsp; &nbsp; &nbsp; &nbsp; @if(isset($monthly_average) && $monthly_average!='') Average Hours Monthly: {{$monthly_average}} @endif &nbsp; &nbsp; &nbsp; &nbsp; @if(isset($yearly_average) && $yearly_average!='') Average Hours Yearly: {{$yearly_average}} @endif</h3>  </caption>
+					 <caption><h3>Name: {{$employee_id[0]}} &nbsp; &nbsp; &nbsp; &nbsp; @if(isset($monthly_average) && $monthly_average!='') Average Hours Monthly: {{$monthly_average}} @endif &nbsp; &nbsp; &nbsp; &nbsp; @if(isset($yearly_average) && $yearly_average!='') Average Hours Yearly: {{$yearly_average}} @endif</h3> <h3>Employee ID:{{$employee_id[1]}}</h3> </caption>
 					<thead>
 						<tr>
 							<th>Date</th>
@@ -47,6 +47,7 @@
  @endsection
 
  @section('local_script')
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.4.1/jspdf.debug.js" integrity="sha384-THVO/sM0mFD9h7dfSndI6TS0PgAGavwKvB5hAxRRvc0o9cPLohB0wb/PTA7LdUHs" crossorigin="anonymous"></script>
  <script type="text/javascript">
 
