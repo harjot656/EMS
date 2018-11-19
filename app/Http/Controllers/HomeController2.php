@@ -200,19 +200,18 @@ class HomeController2 extends Controller
        // echo "<pre>";print_r($data);die;
         $data['value'] = $value;
         $data['employee_attendance'] = $employee_attendance;
-        foreach ($data['value'] as $key => $value) {
-           foreach ($data['employee_attendance'] as $keyy => $valuee) {
-               if($value['employee_id'] == $keyy){
-                $data['value'][$key]['attendance'] = $valuee;
-                
+        if(!empty($data['value'])){
+            foreach ($data['value'] as $key => $value) {
+               foreach ($data['employee_attendance'] as $keyy => $valuee) {
+                   if($value['employee_id'] == $keyy){
+                    $data['value'][$key]['attendance'] = $valuee;
+                    
+                   }
                }
-           }
+            }
         }
-        // echo "<pre>";
-        // print_r($data);
-        // die;
+        
        
-        // $date = '2018-10-12';
         // parse about any English textual datetime description into a Unix timestamp 
         $ts = strtotime($date);
         // calculate the number of days since Monday

@@ -111,6 +111,7 @@ font-size: 12px;
 										</tr>
 									</thead>
 									<tbody>
+									@if(!empty($data['value']))
 										@foreach($data['value'] as $key=>$value)
 										<tr>	
 											<?php //echo "<pre>"; echo count($data['list_date']); print_r($data['list_date']);die?>
@@ -150,6 +151,9 @@ font-size: 12px;
 											@endif 
 										</tr>
 										@endforeach
+									@else
+									<p>No Employee Available</p>
+									@endif	
 									</tbody>
 								</table>
 							</div>

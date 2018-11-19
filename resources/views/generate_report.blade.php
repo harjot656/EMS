@@ -40,6 +40,7 @@
 						</div>
 						
 					</div>
+					@if(!empty($data['value']))
 					<form method="POST" id="generate_report" action="{{route('get_report')}}">
 						
 					@csrf
@@ -48,6 +49,7 @@
 								 <input type="radio" id="all_emp" name="report_by" value="all_employees"> <label for="all_emp">All Employees</label>
 								
                            </div>
+
                            <div class="col-sm-3 col-md-2 col-xs-6">
  								<input type="radio" id="select_emp" name="report_by"><label for="select_emp">Select Employee</label>
 								<div class="form-group form-focus select-focus" >		
@@ -122,7 +124,10 @@
 						</div>
 					</div>
 					<input type="hidden" id="refreshed" value="no">
-				</form>			
+				</form>
+				@else
+				<div>No Employee Available</div>
+				@endif			
 			    </div>
 			    <div id="mainDiv"></div>
 			</div>
