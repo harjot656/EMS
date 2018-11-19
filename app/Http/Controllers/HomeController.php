@@ -20,7 +20,7 @@ use DateTime;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Session;
 use Illuminate\Support\Facades\Hash;
-
+use Exception;
 
 class HomeController extends Controller
 {
@@ -35,21 +35,33 @@ class HomeController extends Controller
 
         $database  = new FirebaseDb;
         
+        
         $reference = $database->get_database()->getReference('employee');
         
         $snapshot = $reference->getSnapshot();
-        $value = $snapshot->getValue();
-        $value = $reference->getValue(); 
+         
         
-        $last_employee_id = end($value);
-        $data['last_employee_id'] = isset($last_employee_id['last_numeric_employee_id'])?$last_employee_id['last_numeric_employee_id']:$last_employee_id['employee_id'];
-        if($data['last_employee_id'] >1000){
-            $data['last_employee_id'] = $data['last_employee_id'] + 1;
-        }else{
-           $data['last_employee_id'] = 1000 + (isset($last_employee_id['last_numeric_employee_id'])?$last_employee_id['last_numeric_employee_id']:$last_employee_id['employee_id']); 
+        // if(!empty($value)){
+	    try{	
+        	$value = $snapshot->getValue();
+        	$value = $reference->getValue();
+	        $last_employee_id = end($value);
+	        $data['last_employee_id'] = isset($last_employee_id['last_numeric_employee_id'])?$last_employee_id['last_numeric_employee_id']:$last_employee_id['employee_id'];
+	        if($data['last_employee_id'] >1000){
+	            $data['last_employee_id'] = $data['last_employee_id'] + 1;
+	        }else{
+	           $data['last_employee_id'] = 1000 + (isset($last_employee_id['last_numeric_employee_id'])?$last_employee_id['last_numeric_employee_id']:$last_employee_id['employee_id']); 
+	        }
+	        // echo "<pre>";print_r($value);die;
+	        return view('index',array('data'=>$value,'last_numeric_employee_id'=>$data['last_employee_id']));
+        }catch(Exception $e){
+        	return view('index',array('data'=>array(),'last_numeric_employee_id'=>1000));
         }
-        // echo "<pre>";print_r($value);die;
-        return view('index',array('data'=>$value,'last_numeric_employee_id'=>$data['last_employee_id']));
+        // else
+        // {
+        //     return view('index',array('data'=>array(),'last_numeric_employee_id'=>1000));
+        // }
+
     }
     public function holiday(Request $request){
         return view('holidays');
@@ -80,19 +92,24 @@ class HomeController extends Controller
         $reference = $database->get_database()->getReference('employee');
         $snapshot = $reference->getSnapshot();
         $data['value'] = $snapshot->getValue();
-       for ($m=1; $m<=date('m'); $m++) {
-         $data['date'][] = date('F', mktime(0,0,0,$m, 1, date('Y')));
-         
-         }
+        try{
+            
+           for ($m=1; $m<=date('m'); $m++) {
+             $data['date'][] = date('F', mktime(0,0,0,$m, 1, date('Y')));
+             
+             }
          $daat['currently_selected'] = date('Y');
          $data['earliest_year'] = 1950;
-         $data['latest_year'] = date('Y'); 
-         
-        return view('generate_report')->with('data',$data);
+         $data['latest_year'] = date('Y');
+         return view('generate_report')->with('data',$data);
+     }catch(\Exception $e){
+        return $e->getMessage();
+     }
     }
 
     public function get_report(Request $request){
     	$data = $request->all();
+        // echo "<pre>";print_r($data);die;
         if(!isset($data['report_by'])){
             return redirect('generate_report');
         }        
@@ -109,6 +126,7 @@ class HomeController extends Controller
             }
         }else if(isset($data['week']) && $data['week']!=''){  //////////  For Range of week 
             $arr = explode(' ',$data['week']);
+           
             if($arr[0]==$arr[2]){
              $date_arr[] = $arr[0];   
             }else{
@@ -159,7 +177,7 @@ class HomeController extends Controller
             foreach($data['employee_list'] as $key=>$value){
                 $reference3 = $database->get_database()->getReference('employee_attendance/'.$value['employee_id'].'');
                 $snapshot3 = $reference3->getSnapshot()->getValue();
-                $all_employee_list[][$value['first_name'].' '.$value['last_name'].'( Employee Id)=>'.$value['employee_id']]['attendance'] = $snapshot3;
+                $all_employee_list[][$value['first_name'].' '.$value['last_name'].'$%#'.$value['employee_id']]['attendance'] = $snapshot3;
                 // $all_employee_list[][$value['employee_id']]['attendance'] =   
             }
 
@@ -224,7 +242,7 @@ class HomeController extends Controller
 					 $data['employee_detail'] = $value;
 				 }
 			 }
-            $name = $data['employee_detail']['first_name'].' '.$data['employee_detail']['last_name'].' (Employee Id)=>'.$data['employee_detail']['employee_id'];
+            $name = $data['employee_detail']['first_name'].' '.$data['employee_detail']['last_name'].'$%#'.$data['employee_detail']['employee_id'];
             // echo "<pre>";print_r($data['employee_detail']);die;
             $i = 0;
             $present = 0;

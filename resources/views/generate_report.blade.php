@@ -1,5 +1,6 @@
 @extends('layouts.master')
  @section('content')
+
  <style type="text/css">
  	.daterangepicker{
  		width: 23%!important;
@@ -39,6 +40,7 @@
 						</div>
 						
 					</div>
+					@if(!empty($data['value']))
 					<form method="POST" id="generate_report" action="{{route('get_report')}}">
 						
 					@csrf
@@ -47,6 +49,7 @@
 								 <input type="radio" id="all_emp" name="report_by" value="all_employees"> <label for="all_emp">All Employees</label>
 								
                            </div>
+
                            <div class="col-sm-3 col-md-2 col-xs-6">
  								<input type="radio" id="select_emp" name="report_by"><label for="select_emp">Select Employee</label>
 								<div class="form-group form-focus select-focus" >		
@@ -120,7 +123,11 @@
 							<button id="gen_rpt" class="btn btn-primary">Generate Report</button>
 						</div>
 					</div>
-				</form>			
+					<input type="hidden" id="refreshed" value="no">
+				</form>
+				@else
+				<div>No Employee Available</div>
+				@endif			
 			    </div>
 			    <div id="mainDiv"></div>
 			</div>
@@ -132,6 +139,26 @@
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 
 <script type="text/javascript">
+$(window).bind("pageshow", function() {
+	var e=document.getElementById("refreshed");
+	if(e.value=="no")e.value="yes";
+	else{
+		alert("Please wait while resetting page value");
+		e.value="no";window.location.reload(true);
+	}
+  console.log("HFFFFFFFF");
+});
+
+// onload=function(){
+// var e=document.getElementById("refreshed");
+
+// if(e.value=="no")e.value="yes";
+// else{
+
+// 	alert("Please wait while resetting page value");
+// 	e.value="no";window.location.reload(true);
+// }
+// }
 	$("#employee,#specify-month,#specify-year").select2();
 	// $(".floating").select2();
 	$(document).ready(function() {
@@ -193,63 +220,52 @@
 	$("#gen_rpt").on('click',function(e){
 	// 	console.log($("#generate_report").valid());
 		if($("#generate_report").valid()){
-			var value = $("#specify-week").val();
-			var arr = value.split(' ');
+			// var value = $("#specify-week").val();
+			// var arr = value.split(' ');
 	
-			arr[0] = arr[0].split('-').reverse().join('-');
-			arr[2] = arr[2].split('-').reverse().join('-');
-			console.log(arr[0]+" "+arr[2]);
-			var date2 = new Date(arr[2]);
-			var date1 = new Date(arr[0]);
-			var timeDiff = Math.abs(date2.getTime() - date1.getTime());
-			var day_difference = Math.ceil(timeDiff / (1000 * 3600 * 24));
-			if(day_difference!=7){
-				$("#specify-week").after("<div class='alert alert-danger custom_div_error'>Please select range with 7 days</div>");
-			e.preventDefault();
-			}else{
-				$('.custom_div_error').remove();
+			// arr[0] = arr[0].split('-').reverse().join('-');
+			// arr[2] = arr[2].split('-').reverse().join('-');
+			// console.log(arr[0]+" "+arr[2]);
+			// var date2 = new Date(arr[2]);
+			// var date1 = new Date(arr[0]);
+			// var timeDiff = Math.abs(date2.getTime() - date1.getTime());
+			// var day_difference = Math.ceil(timeDiff / (1000 * 3600 * 24));
+			// if(day_difference!=7){
+			// 	$("#specify-week").after("<div class='alert alert-danger custom_div_error'>Please select range with 7 days</div>");
+			// e.preventDefault();
+			// }else{
+			// 	$('.custom_div_error').remove();
 				
-			}
-	// 		e.preventDefault();
-	// 		$.ajax({
-	// 			headers: {
-	// 		        'X-CSRF-TOKEN': $('input[name="_token"]').val()
-	// 		    },
-	// 			url: '{{route("get_report")}}',
-	// 			type: 'POST',
-	// 			dataType:'html',
-	// 			data: {param1: $("#generate_report").serialize()},
-	// 		})
-	// 		.done(function(data) {
-	// 			$("#mainDiv").html('').html(data);
-	// 			// console.log(data);
-	// 			console.log("success");
-	// 		})
-	// 		.fail(function() {
-	// 			console.log("error");
-	// 		})
-	// 		.always(function() {
-	// 			console.log("complete");
-	// 		});
-			
+			// }	
 		}	
 	});
-	$("#specify-week").daterangepicker({
-		autoUpdateInput: false,
-		locale: {
-			cancelLabel: 'Clear',
-      format: 'DD-MM-YYYY',
-    },
-    maxDate:new Date(),
-    onSelect:function(){
-    	endDate: '+7d'
-    }
-	});
-$('#specify-week').on('apply.daterangepicker', function(ev, picker) {
-	// console.log(ev+" "+;
+	// $("#specify-week").daterangepicker({
+	// 	autoUpdateInput: false,
+	// 	locale: {
+	// 		cancelLabel: 'Clear',
+ //      format: 'DD-MM-YYYY',
+ //    },
+ //    maxDate:new Date(),
+ //    onSelect:function(){
+ //    	endDate: '+7d'
+ //    }
+	// });
+$("#specify-week").datetimepicker({
+    format: 'DD-MM-YYYY',
+});
+
+$('#specify-week').on('dp.change', function (e) {
+	console.log("Here");
+    value = $("#specify-week").val();
+    firstDate = moment(value, "DD-MM-YYYY").day(0).format("DD-MM-YYYY");
+    lastDate =  moment(value, "DD-MM-YYYY").day(6).format("DD-MM-YYYY");
+    $("#specify-week").val(firstDate+ " - " +lastDate);
+});
+// $('#specify-week').on('apply.daterangepicker', function(ev, picker) {
+// 	// console.log(ev+" "+;
 	
-      $(this).val(picker.startDate.format('DD-MM-YYYY') + ' - ' + picker.endDate.format('DD-MM-YYYY'));
-  });
+//       $(this).val(picker.startDate.format('DD-MM-YYYY') + ' - ' + picker.endDate.format('DD-MM-YYYY'));
+//   });
 	
 </script>
 @endsection
