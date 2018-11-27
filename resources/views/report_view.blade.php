@@ -2,7 +2,7 @@
  @section('content')
 
 <div class='' style="margin-top: 20px;">
-	<center><h2>Attandace Sheet</h2></center>
+	<center><h2>Attendance Sheet</h2></center>
 	
 	<div class='row' id="content">
 		@foreach($data as $key=>$value)

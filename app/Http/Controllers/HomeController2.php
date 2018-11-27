@@ -17,6 +17,7 @@ use Validator;
 use Response;
 use Carbon\Carbon;
 use DateTime;
+use Exception;
 
 class HomeController2 extends Controller
 {
@@ -146,6 +147,9 @@ class HomeController2 extends Controller
         $snapshot2 = $reference2->getSnapshot();
         $employee_attendance = $snapshot2->getValue();
 
+
+
+
         $list=array();
         if ($request->isMethod('post')) {
             // echo "<pre>";print_r($request->all());
@@ -200,18 +204,8 @@ class HomeController2 extends Controller
        // echo "<pre>";print_r($data);die;
         $data['value'] = $value;
         $data['employee_attendance'] = $employee_attendance;
-        if(!empty($data['value'])){
-            foreach ($data['value'] as $key => $value) {
-               foreach ($data['employee_attendance'] as $keyy => $valuee) {
-                   if($value['employee_id'] == $keyy){
-                    $data['value'][$key]['attendance'] = $valuee;
-                    
-                   }
-               }
-            }
-        }
         
-       
+      
         // parse about any English textual datetime description into a Unix timestamp 
         $ts = strtotime($date);
         // calculate the number of days since Monday
@@ -238,6 +232,20 @@ class HomeController2 extends Controller
         $data['latest_year'] = date('Y'); 
         // echo "<pre>";print_r($data);
         // die;
+        try{
+        if(!empty($data['value'])){
+            foreach ($data['value'] as $key => $value) {
+               foreach ($data['employee_attendance'] as $keyy => $valuee) {
+                   if($value['employee_id'] == $keyy){
+                    $data['value'][$key]['attendance'] = $valuee;
+                    
+                   }
+               }
+            }
+        }
+        }catch(Exception $e){
+           return view('add_attandance3')->with('data',$data);
+        }
         return view('add_attandance3')->with('data',$data);
     }
 

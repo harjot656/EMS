@@ -21,6 +21,8 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Session;
 use Illuminate\Support\Facades\Hash;
 use Exception;
+use DateInterval;
+use DatePeriod;
 
 class HomeController extends Controller
 {
@@ -126,20 +128,20 @@ class HomeController extends Controller
             }
         }else if(isset($data['week']) && $data['week']!=''){  //////////  For Range of week 
             $arr = explode(' ',$data['week']);
-           
+           // echo "<pre>";print_r($arr);die;
             if($arr[0]==$arr[2]){
              $date_arr[] = $arr[0];   
             }else{
-                $date_from = strtotime($arr[0]);   
-                $date_to = strtotime($arr[2]);
-                for ($i=$date_from; $i<=$date_to; $i+=86400) {  
-                    $date_arr[] = date("d-m-Y", $i);  
+                $start    = new DateTime($arr[0]);
+                $end      = new DateTime($arr[2]);
+                $end->modify('+1 day');  //For PHP < 5.4 which doesn't support array dereferencing
+                $interval = new DateInterval('P1D');
+                $period   = new DatePeriod($start, $interval, $end);
+                $date_arr = array();
+                foreach ($period as $dt) {
+                    $date_arr[] = $dt->format("d-m-Y");
                 }
             }    
-            // $pos = strrpos($request->week, ' ');
-            // $first = substr($string, 0, $pos);
-            // $second = substr($string, $pos + 1)
-
         }else if(isset($data['month_by']) && $data['month_by']!=''){  //////////  For Entire Month
             $year = date('Y');
             $monthname =  $data['month_by'];
@@ -162,6 +164,8 @@ class HomeController extends Controller
         }else{
             return redirect()->back();
         }
+         // echo "<pre>";print_r($date_arr);die;
+        
         // echo "<pre>";print_r($request->all());die;
         if($data['report_by'] =='all_employees'){   	
             $database  = new FirebaseDb;

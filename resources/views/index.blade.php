@@ -5,6 +5,7 @@
     width: 100%;
     padding: 10px 5px;
 }
+
 </style>
 <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
    <div class="page-wrapper">
@@ -315,7 +316,7 @@
 									</div>
 									<div class="col-sm-6">
 										<div class="form-group">
-											<label class="control-label">Last Name</label>
+											<label class="control-label">Last Name <span class="text-danger">*</span></label>
 											<input class="form-control add-name" type="text" name="last_name">
 										</div>
 									</div>
@@ -357,7 +358,7 @@
 									</div>
 									<div class="col-sm-6">
 										<div class="form-group">
-											<label class="control-label">Phone </label>
+											<label class="control-label">Phone <span class="text-danger">*</span></label>
 											<input class="form-control" type="text" name="phone">
 										</div>
 									</div>
@@ -416,7 +417,7 @@
 									</div>
 									<div class="col-sm-6">
 										<div class="form-group">
-											<label class="control-label">Last Name</label>
+											<label class="control-label">Last Name <span class="text-danger">*</span></label>
 											<input class="form-control" type="text" id="last_name" name="last_name">
 										</div>
 									</div>
@@ -458,7 +459,7 @@
 									</div>
 									<div class="col-sm-6">
 										<div class="form-group">
-											<label class="control-label">Phone </label>
+											<label class="control-label">Phone <span class="text-danger">*</span></label>
 											<input class="form-control" type="text" id="phone" name="phone">
 										</div>
 									</div>
