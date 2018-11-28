@@ -155,7 +155,8 @@ class HomeController2 extends Controller
             // echo "<pre>";print_r($request->all());
            $month = $request->select_month<10?'0'.$request->select_month:$request->select_month;
            $year = $request->year;       
-           $days = cal_days_in_month(CAL_GREGORIAN,$request->select_month,$request->year);
+           //$days = cal_days_in_month(CAL_GREGORIAN,$request->select_month,$request->year);
+           $days = date('t',mktime(0,0,0,$month,1,$year));
            for($i=1;$i<=$days;$i++){
               $day[$i]['day_number'] = $i;
               $day[$i]['day_name'] = date('D',strtotime($i.'-'.$month.'-'.$year));  
@@ -171,7 +172,11 @@ class HomeController2 extends Controller
         }else{
             $month = date('m');
             $year = date('Y');
-            $days = cal_days_in_month(CAL_GREGORIAN,$month,$year);
+            $days = date('t',mktime(0,0,0,$month,1,$year));
+            // echo $no_of_days;die;
+            // $days = cal_days_in_month(CAL_GREGORIAN,$month,$year);
+            // echo '<br>'.$days;
+            // die;
             for($i=1;$i<=$days;$i++){
               $day[$i]['day_number'] = $i;
               $day[$i]['day_name'] = date('D',strtotime($i.'-'.$month.'-'.$year));  
