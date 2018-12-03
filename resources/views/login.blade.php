@@ -48,9 +48,7 @@
 								@if ($errors->has('errors'))
 									    <div class="error-ems">{{ $errors->first('errors') }}</div>
 									@endif
-								<div class="text-center">
-									<a href="forgot-password.php">Forgot your password?</a>
-								</div>
+								
 							</form>
 						</div>
 					</div>
