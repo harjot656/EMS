@@ -17,7 +17,7 @@ class FirebaseDb extends Authenticatable
 
     /**
      * The attributes that are mass assignable.
-     *
+     * Final Commit.
      * @var array
      */
     /*protected $fillable = [
@@ -29,17 +29,17 @@ class FirebaseDb extends Authenticatable
      *
      * @var array
      */
-    
-    
-    
-    public function get_database()
-    {   
 
-        try{ 
+
+
+    public function get_database()
+    {
+
+        try{
 
             $serviceAccount = ServiceAccount::fromJsonFile('./vendor/ems-php-7be99-008e26379391.json');
             $firebase = (new Factory)->withServiceAccount($serviceAccount)->create();
-            $database = $firebase->getDatabase();    
+            $database = $firebase->getDatabase();
             return $database;
             //print_r($database);
         }
@@ -49,8 +49,8 @@ class FirebaseDb extends Authenticatable
         }
 
     }
-    
-    
+
+
     protected $hidden = [
         'password', 'remember_token',
     ];
