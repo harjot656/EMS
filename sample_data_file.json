@@ -1,0 +1,84 @@
+{
+  "admin" : {
+    "-LREpcPADCTrIMMOA3dx" : {
+      "password" : "$2y$04$fPRI2YEx1ojWoIsQ3KSHg.81F7gnPIeUmOoE1v45yaFU7R6IQ/l.G",
+      "username" : “xyz99”
+    }
+  },
+  "employee" : {
+    "-LRyY9B0o9aIxOwHHRKG" : {
+      "designation" : "Manager",
+      "email" : "liam@gmail.com",
+      "employee_id" : “xyz99”,
+      "first_name" : "Liam",
+      "joining_date" : “31/02/2018",
+      "last_name" : "Peyton",
+      "last_numeric_employee_id" : “99”,
+      "password" : "$2y$10$ixRYgE1mE1rV5.hlms083OtBeLt.N8LT1Y6aypS1QEai2b0cHo2SS",
+      "phone" : “123456789”
+    },   
+    "-LSu8GdqEZ3lsGe5IRvl" : {
+      "designation" : "Associate",
+      "email" : “mehndi@gmail.com",
+      "employee_id" : “xyz99”,
+      "first_name" : "Test",
+      "joining_date" : “31/11/2018",
+      "last_name" : “Salehi”,
+      "last_numeric_employee_id" : “99”,
+      "password" : "$2y$10$ZLNR637KGU8vL1iZ8DDLwez/J7uZcFSS3CkYzJr4D1LcD3U5lNQma",
+      "phone" : "1234567890"
+    }
+  },
+  "employee_attendance" : {
+    “xyz99” : {
+      “31-02-2018" : {
+        "comments" : "",
+        "in-time" : "19-11-2018 10:00 AM",
+        "name" : "Attendance",
+        "out-time" : "19-11-2018 5:00 PM",
+        "shift_hours" : "7 hours",
+        "status" : "present"
+      }
+    },
+     “xyz99” : {
+      “31-02-2018" : {
+        "comments" : “no show“,
+        "in-time" : "",
+        "name" : "Attendance",
+        "out-time" : "",
+        "shift_hours" : "",
+        "status" : "absent"
+      }
+    },
+    “xyz99” : {
+      “31-02-2018" : {
+        "comments" : “on leave“,
+        "in-time" : "",
+        "name" : "Attendance",
+        "out-time" : "",
+        "shift_hours" : "",
+        "status" : "vacation"
+      }
+    },
+     “xyz99” : {
+      “31-02-2018" : {
+        "comments" : "Call in Sick",
+        "in-time" : "",
+        "name" : "Attendance",
+        "out-time" : "",
+        "shift_hours" : "",
+        "status" : "sick"
+      }
+    },
+    “xyz99” : {
+      “31-02-2018" : {
+        "comments" : “full time employee no weekend work”,
+        "in-time" : "",
+        "name" : "Attendance",
+        "out-time" : "",
+        "shift_hours" : "",
+        "status" : “weekend”
+      }
+    }
+  }
+}
