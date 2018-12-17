@@ -13,7 +13,7 @@
 							<div class="row">
 								<div class="col-md-12">
 									<div class="profile-img-wrap">
-										<img class="inline-block" src="{{asset('img/user.jpg')}}" alt="user">
+										<img class="inline-block" src="{{secure_asset('img/user.jpg')}}" alt="user">
 										<div class="fileupload btn btn-default">
 											<span class="btn-text">edit</span>
 											<input class="upload" type="file">
