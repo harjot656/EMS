@@ -54,7 +54,7 @@ class AlphaTest extends TestCase
         
         if($incorrect ==0)
         {
-               $this->assertTrue(false);
+               $this->assertTrue(true);
         }
     }
 
