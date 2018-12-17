@@ -11,7 +11,7 @@
 |
 */
 
-if (env('APP_ENV') === 'production') {
+if (env('APP_ENV') === 'local') {
     URL::forceSchema('https');
 }
 
