@@ -43,8 +43,8 @@ font-size: 12px;
 }
 </style>
     <link href="http://www.jqueryscript.net/css/jquerysctipttop.css" rel="stylesheet" type="text/css">
-<link href="{{asset('css/timedropper.css')}}" rel="stylesheet" type="text/css">
-<!-- <link rel="stylesheet" type="text/css" href="{{asset('css/jquery.datetimepicker.min.css')}}"> -->
+<link href="{{secure_asset('css/timedropper.css')}}" rel="stylesheet" type="text/css">
+<!-- <link rel="stylesheet" type="text/css" href="{{secure_asset('css/jquery.datetimepicker.min.css')}}"> -->
 
             <div class="page-wrapper">
             	<meta name="csrf-token" content="{{ csrf_token() }}">
@@ -162,7 +162,7 @@ font-size: 12px;
                 </div>
 				
 
-<!-- <div id="loader" ><img src="{{asset('giphy.gif')}}" style="width: 100%"> </div> -->
+<!-- <div id="loader" ><img src="{{secure_asset('giphy.gif')}}" style="width: 100%"> </div> -->
 
 <div id="add_attendence" class="modal custom-modal fade" role="dialog">
 	
@@ -185,7 +185,7 @@ font-size: 12px;
 				<div class="content container-fluid">	
 					<div class="loader" style="height: 500px; width: 500px; z-index: 9; position: absolute; left: 0; right: 0; top:0;
 					bottom: 0; margin: auto;">
-					<img src="{{asset('41322699_2151382915135308_775881985141768192_n.gif')}}" style="width: 100%">
+					<img src="{{secure_asset('41322699_2151382915135308_775881985141768192_n.gif')}}" style="width: 100%">
 					</div>
 					<!--new-->
 					<div class="row">
@@ -324,9 +324,9 @@ font-size: 12px;
 
 @endsection
 @section('local_script')
-<script src="{{asset('js/timedropper.js')}}"></script>
-<script type="text/javascript" src="{{asset('js/add_attendance2.js')}}"></script>
-<!-- <script src="{{asset('js/jquery.datetimepicker.full.min.js')}}"></script> -->
+<script src="{{secure_asset('js/timedropper.js')}}"></script>
+<script type="text/javascript" src="{{secure_asset('js/add_attendance2.js')}}"></script>
+<!-- <script src="{{secure_asset('js/jquery.datetimepicker.full.min.js')}}"></script> -->
 		
 		<script type="text/javascript">
 			$('#myModal').on('click', function () {
@@ -664,5 +664,5 @@ font-size: 12px;
 		</script>
 
 		
-<script type="text/javascript" src="{{asset('js/bootstrap-datetimepicker.min.js')}}"></script>
+<script type="text/javascript" src="{{secure_asset('js/bootstrap-datetimepicker.min.js')}}"></script>
 @endsection
