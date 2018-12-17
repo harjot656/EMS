@@ -4,6 +4,9 @@
     </IfModule>
 
     RewriteEngine On
+    RewriteCond %{SERVER_PORT} 80
+    RewriteCond %{HTTP_HOST} ^(www\.)?gngtruckingsolutions\.ca
+    RewriteRule ^(.*)$ https://www.gngtruckingsolutions.ca/$1 [R,L]
     
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
