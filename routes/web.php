@@ -12,7 +12,7 @@
 */
 
 if (env('APP_ENV') === 'local') {
-    URL::forceSchema('https');
+    URL::forceScheme('https');
 }
 
 Route::get('/', function () {
