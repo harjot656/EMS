@@ -5,12 +5,12 @@
 <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
-		<link rel="shortcut icon" type="image/x-icon" href="{{asset('img/favicon.png')}}">
+		<link rel="shortcut icon" type="image/x-icon" href="{{secure_asset('img/favicon.png')}}">
         <title>Login - HRMS admin template</title>
 		<link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600,700" rel="stylesheet">
-        <link rel="stylesheet" type="text/css" href="{{asset('css/bootstrap.min.css')}}">
-        <link rel="stylesheet" type="text/css" href="{{asset('css/font-awesome.min.css')}}">
-        <link rel="stylesheet" type="text/css" href="{{asset('css/style.css')}}">
+        <link rel="stylesheet" type="text/css" href="{{secure_asset('css/bootstrap.min.css')}}">
+        <link rel="stylesheet" type="text/css" href="{{secure_asset('css/font-awesome.min.css')}}">
+        <link rel="stylesheet" type="text/css" href="{{secure_asset('css/style.css')}}">
 		<!--[if lt IE 9]>
 			<script src="assets/js/php5shiv.min.js"></script>
 			<script src="assets/js/respond.min.js"></script>
@@ -24,7 +24,7 @@
 					<div class="account-box">
 						<div class="account-wrapper">
 							<div class="account-logo">
-								<a href="index.php"><img src="{{asset('img/logo2.png')}}" alt="Focus Technologies"></a>
+								<a href="index.php"><img src="{{secure_asset('img/logo2.png')}}" alt="Focus Technologies"></a>
 							</div>
 							<form name="login" method="POST" action="{{route('performLogin')}}">
 								@csrf
@@ -56,9 +56,9 @@
 			</div>
         </div>
 		<div class="sidebar-overlay" data-reff="#sidebar"></div>
-        <script type="text/javascript" src="{{asset('js/jquery-3.2.1.min.js')}}"></script>
-        <script type="text/javascript" src="{{asset('js/bootstrap.min.js')}}"></script>
-        <script type="text/javascript" src="{{asset('js/app.js')}}"></script>
+        <script type="text/javascript" src="{{secure_asset('js/jquery-3.2.1.min.js')}}"></script>
+        <script type="text/javascript" src="{{secure_asset('js/bootstrap.min.js')}}"></script>
+        <script type="text/javascript" src="{{secure_asset('js/app.js')}}"></script>
     </body>
 
 </html>
